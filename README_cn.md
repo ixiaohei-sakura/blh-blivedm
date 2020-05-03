@@ -3,7 +3,6 @@
 ###### 此插件使用了`subprocess.Popen`启动一个单独的WebSocketBlh程序，负责获取他的`sys.stdout`,再接下来输入到游戏之中.
 
 ###### WebSocketBlh获取: [作者xfgryujk] https://github.com/xfgryujk/blivedm
-###### MCDReforged: [作者Fallen-Breat] https://github.com/Fallen-Breath/MCDReforged
 ###### blh-Websocket-plugin [作者ixiaohei] https://github.com/ixiaohei-sakura/blh-blivedm
 
 性能对比:
