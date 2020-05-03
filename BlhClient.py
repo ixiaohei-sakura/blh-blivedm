@@ -7,9 +7,10 @@ import time
 from pathlib import *
 import urllib3
 
+datahead = '§cBlhControlThread§r/§e{0} §r'
 cmd = '!!blh'
-rooturl = "bs.s1.blackserver.cn:8900"
-selfname = ""
+rooturl = 'bs.s1.blackserver.cn:8900'
+selfname = ''
 ON_POSIX = 'posix' in sys.builtin_module_names
 p = Popen('', shell = True)
 stopflag = True
@@ -19,17 +20,24 @@ q = None
 
 helpmsg = '''§e-------------WebSocketBlhClient--help-------------
 {0}: §b显示help
-{0} help: §b显示help
+{0} help [页数(可选,默认1)]: §b显示help
 {0} add [自定义名称] [房间id]: §b向配置文件里添加一个blh启动项
 {0} rm [名称]: §b删除config.conf
 {0} start [名称]: §b启动一个在配置文件blhClient
 {0} stop [名称]: §b停止一个正在运行的blhClient
-{0} checkud: §b检查版本更新
-{0} reload: §b重载此插件的内容(一般用不到)
-§e-----------------------------------------------'''.format('§n§7' + cmd)
+{0} stop all: §b停止所有正在运行的blhClient
+{0} list: §b列出所有在配置文件中的可用直播间
+§e-------------------页2/1--------------------'''.format('§n§7' + cmd)
 
-def printHelp(server, player):
-    for line in helpmsg.splitlines():
+helpmsg_2 = '''§e-------------WebSocketBlhClient--help-------------
+{0} v: §b查看现在运行的BlhClient版本
+{0} vmsg: §b查看现在运行的BlhClient更新消息
+{0} reload: §b重载此插件的内容(一般用不到)
+{0} checkud: §b检查版本更新
+§e-------------------页2/2------------------------'''.format('§n§7' + cmd)
+
+def printHelp(server, player, msg):
+    for line in msg.splitlines():
         if line != '\n' and line != '\r' and line != '':
             server.tell(player, line)
 
@@ -88,7 +96,7 @@ def start_dm(server, roomid):
     t = Thread(target=enqueue_output, args=(p.stdout, q))
     t.daemon = True
     t.start()
-    dm_logger(server, '已订阅{}的直播间'.format(selfname))
+    dm_logger(server, datahead.format('info') + '已订阅{}的直播间'.format(selfname))
     time.sleep(2)
 
 def stop_dm(server, player):
@@ -130,6 +138,9 @@ def dm_logger(server, data, name = "defalt"):
         args = buff.split('|')
         server.say('§b[§cBLH§r§b][§c{0}§b] §c{1}§r:{2}'.format(name, args[0], args[1]))
     else:
+        if '人气' in buff:
+            server.say('111')
+            return None
         server.say('§b[§cBLH§r§b]§r ' + buff)
 
 def dm_logger_tell(server, buff, player = '@a'):
@@ -210,59 +221,58 @@ def test_file(server, player):
 
 def check_update(server, player):
     dm_logger(server, '检查更新中,请耐心等待.期间请勿重载插件!')
-    time.sleep(0.5)
     url = rooturl + '/ver'
     http = urllib3.PoolManager()
     res = http.request('GET', url)
     f = open('plugins/blh/ver', 'r')
     ver = f.read()
-    time.sleep(0.5)
     if int(res.data) > int(ver):
         dm_logger(server, '有新版本的Blh可用!')
+        dm_logger(server, '最新版本为: {0}.0.0'.format(str(res.data, encoding='utf-8')))
         time.sleep(1.5)
-        dm_logger(server, '停止所有房间')
+        dm_logger(server, datahead.format('info') + '停止所有房间')
         stop_dm(server, player)
-        time.sleep(0.5)
         dm_logger(server, '等待3秒之后将开始更新.期间请勿重载插件!')
         time.sleep(3)
-        dm_logger_tell(server, '准备更新: demo.py')
+        dm_logger_tell(server, '更新: demo.py')
         url = rooturl + '/demo.py'
         http = urllib3.PoolManager()
         res = http.request('GET', url)
         os.remove('plugins/blh/demo.py')
         f = open('plugins/blh/demo.py', 'w')
         f.write(str(res.data, encoding='utf-8'))
-        time.sleep(1.5)
-        dm_logger_tell(server, '准备更新: blivedm.py')
+        dm_logger_tell(server, '更新: blivedm.py')
         url = rooturl + '/blivedm.py'
         http = urllib3.PoolManager()
         res = http.request('GET', url)
         os.remove('plugins/blh/blivedm.py')
         f = open('plugins/blh/blivedm.py', 'w')
         f.write(str(res.data, encoding='utf-8'))
-        time.sleep(1.5)
-        dm_logger_tell(server, '准备更新版本文件')
+        dm_logger_tell(server, '更新版本文件')
         url = rooturl + '/ver'
         http = urllib3.PoolManager()
         res = http.request('GET', url)
         os.remove('plugins/blh/ver')
         f = open('plugins/blh/ver', 'w')
         f.write(str(res.data, encoding='utf-8'))
-        time.sleep(1.5)
-        dm_logger_tell(server, '准备更新Blh主程序, Blh即将退出!')
+        dm_logger_tell(server, '更新Blh主程序, Blh即将退出!')
         url = rooturl + '/BlhClient.py'
         http = urllib3.PoolManager()
         res = http.request('GET', url)
         os.remove('plugins/BlhClient.py')
         f = open('plugins/BlhClient.py', 'w')
         f.write(str(res.data, encoding='utf-8'))
-        time.sleep(1.5)
-        dm_logger(server, '即将重载!')
+        dm_logger(server, datahead.format('info') + '即将重载!')
         global ud
         ud = True
         server.load_plugin('BlhClient.py')
     else:
         dm_logger(server, 'blh已经是最新版本!')
+        dm_logger(server, '目前版本: v{0}.0.0'.format(str(res.data, encoding='utf-8')))
+        url = rooturl + '/msg'
+        http = urllib3.PoolManager()
+        res = http.request('GET', url)
+        server.say(str(res.data, encoding='utf-8'))
 
 
 
@@ -293,27 +303,32 @@ def on_load(server, old):
     os.system('chmod 777 plugins/BlhClient.py')
     os.system('chmod 777 plugins/blh/*')
     os.system('chmod 777 plugins/blh')
-
+    
     if old.ud == True:
-        time.sleep(0.5)
         dm_logger(server, 'blh已经更新到最新版本!')
+        f = open('plugins/blh/ver', 'r')
+        ver = f.read()
+        dm_logger(server, '版本: v{0}.0.0'.format(ver))
+        dm_logger(server, 'blh已经是最新版本!')
+        url = rooturl + '/msg'
+        http = urllib3.PoolManager()
+        res = http.request('GET', url)
+        server.say(str(res.data, encoding='utf-8'))
 
     try:
         f = open('plugins/blh/ver', 'r')
     except:
-        time.sleep(2)
-        dm_logger(server, '检测到第一次启动, 准备初始化')
+        time.sleep(1.5)
+        dm_logger(server, datahead.format('info') + '检测到第一次启动, 准备初始化')
         time.sleep(1.5)
         test_file(server, '@a')
-        time.sleep(1.5)
         check_update(server, '@a')
     else:
         if f.read() == '0':
-            time.sleep(2)
+            time.sleep(1.5)
             dm_logger(server, '检测到第一次启动, 准备初始化')
             time.sleep(1.5)
             test_file(server, '@a')
-            time.sleep(1.5)
             check_update(server, '@a')
 
 
@@ -323,7 +338,17 @@ def on_info(server, info):
     if info.content.startswith('!!blh'):
         startargs = info.content.split(' ')
         if len(startargs) == 1:
-            printHelp(server, info.player)
+            printHelp(server, info.player, helpmsg)
+        elif len(startargs) == 2 and startargs[1] == 'help':
+            printHelp(server, info.player, helpmsg)
+        elif len(startargs) == 3 and startargs[1] == 'help':
+            if startargs[2] == '1':
+                printHelp(server, info.player, helpmsg)
+            elif startargs[2] == '2':
+                server.tell(info.player, '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
+                printHelp(server, info.player, helpmsg_2)
+            else:
+                printHelp(server, info.player, helpmsg)
         elif len(startargs) == 4 and startargs[1] == 'add':
             test_file(server, info.player)
             if write(startargs[2], startargs[3]) is not False:
@@ -335,6 +360,14 @@ def on_info(server, info):
                 dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 删除成功!'.format('info'), info.player)
             else:
                 dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §4 删除失败!'.format('info'), info.player)
+        elif len(startargs) == 2 and startargs[1] == 'list':
+            dm_logger_tell(server, '直播间列表:')
+            with open('plugins/blh/config.conf', 'r') as f:
+                for line in f.readlines():
+                    tmp = line.split('=')
+                    tmp[0] = tmp[0].replace('\n', '')
+                    tmp[1] = tmp[1].replace('\n', '')
+                    dm_logger_tell(server, '名称:{0} 房号:{1}'.format(tmp[0], tmp[1]))
         elif len(startargs) == 3 and startargs[1] == 'start':
             init(server, info, startargs)
             while stopflag and p.poll() is None:
@@ -345,15 +378,42 @@ def on_info(server, info):
                 else:
                     dm_logger(server, line, selfname)
         elif len(startargs) == 3 and startargs[1] == 'stop':
-            if startargs[2] == selfname:
+            if startargs[2] == 'all':
+                stop_dm(server, 'None')
+                if selfname != '':
+                    dm_logger(server, '已取消订阅{0}房间'.format('所有'))
+                    selfname = ""
+                    try:
+                        os.system('ps aux|grep "python3 demo.py"|grep -v grep|cut -c 9-15|xargs kill -15')
+                    except:
+                        pass
+                else:
+                    dm_logger(server, datahead.format('Warn') + '没有房间可以被取消订阅')
+            elif startargs[2] == selfname:
                 stop_dm(server, info.player)
                 dm_logger(server, '已取消订阅{0}的直播间'.format(selfname))
                 selfname = ""
             else:
                 dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 参数错误'.format('info'), info.player)
         elif len(startargs) == 2 and startargs[1] == 'reload':
+            dm_logger_tell(server, '正在停止所有房间')
+            stop_dm(server, 'None')
             selfname = ""
+            try:
+                os.system('ps aux|grep "python3 demo.py"|grep -v grep|cut -c 9-15|xargs kill -15')
+            except:
+                pass
             server.load_plugin("BlhClient.py")
-        
         elif len(startargs) == 2 and startargs[1] == 'checkud':
             check_update(server, info.player)
+        elif len(startargs) == 2 and startargs[1] == 'v':
+            f = open('plugins/blh/ver', 'r')
+            ver = f.read()
+            dm_logger(server, '当前版本: v{0}.0.0'.format(ver))
+        elif len(startargs) == 2 and startargs[1] == 'vmsg':
+            url = rooturl + '/msg'
+            http = urllib3.PoolManager()
+            res = http.request('GET', url)
+            server.say(str(res.data, encoding='utf-8')) 
+        else:
+            dm_logger_tell(server, datahead.format('Warn') + '参数错误, 请!!blh help查看帮助')
