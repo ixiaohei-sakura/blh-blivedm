@@ -6,7 +6,7 @@ import os
 import time
 from pathlib import Path
 import urllib3
-from utils.stext import *
+from utils.rtext import *
 
 Prefix = '!!blh'
 datahead = '§cBlhControlThread§r/§e{0} §r'
@@ -38,34 +38,35 @@ helpmsg_2 = '''§e-------------WebSocketBlhClient--help-------------
 {0} vmsg: §b查看现在运行的BlhClient更新消息
 {0} reload: §b重载此插件的内容(一般用不到)
 {0} checkud: §b检查版本更新
+{0} ud: §b强制更新(不管是不是最新版本)
 §e-------------------页2/2------------------------'''.format('§n§7' + cmd)
 
-def get_text(t1, t2='', t3='', color=SColor.white, run=True):
-    if t2 != '':
-        if t3 != '':
+def get_text(text, mous='', cickrun='', color=RColor.white, run=True):
+    if mous != '':
+        if cickrun != '':
             if run:
-                stxt = SText(t1, color=color).set_hover_text(
-                    t2).set_click_event(SAction.run_command, t3)
+                stxt = RText(text, color=color).set_hover_text(
+                    mous).set_click_event(RAction.run_command, cickrun)
             else:
-                stxt = SText(t1, color=color).set_hover_text(
-                    t2).set_click_event(SAction.suggest_command, t3)
+                stxt = RText(text, color=color).set_hover_text(
+                    mous).set_click_event(RAction.suggest_command, cickrun)
         else:
-            stxt = SText(t1, color=color,
-                         styles=SStyle.italic).set_hover_text(t2)
+            stxt = RText(text, color=color,
+                         styles=RStyle.italic).set_hover_text(mous)
     else:
-        if t3 != '':
-            stxt = SText(t1, color=color)
+        if cickrun == '':
+            stxt = RText(text, color=color)
         else:
             if run:
-                stxt = SText(t1, color=color).set_click_event(
-                    SAction.run_command, t3)
+                stxt = RText(text, color=color).set_click_event(
+                    RAction.run_command, cickrun)
             else:
-                stxt = SText(t1, color=color).set_click_event(
-                    SAction.suggest_command, t3)
+                stxt = RText(text, color=color).set_click_event(
+                    RAction.suggest_command, cickrun)
     return stxt
 
 
-easycmds = STextList(
+easycmds = RTextList(
     get_text('§e------------§bBlhClient§e------------\n   '),
     get_text(f'§7{Prefix} add [名称] [roomid]', '§b添加一个房间', f'{Prefix} add ', run=False),
     get_text(' §r§b添加房间\n   '),
@@ -88,7 +89,11 @@ easycmds = STextList(
     get_text(f'§7   {Prefix} reload', '§b重载blh', f'{Prefix} reload'),
     get_text(' §r§b重载blh\n'),
     get_text(f'§7   {Prefix} checkud', '§b检查版本更新', f'{Prefix} reload'),
-    get_text(' §r§b更新blh'),
+    get_text(' §r§b更新blh\n'),
+    get_text(f'§7   {Prefix} ud', '§b强制更新', f'{Prefix} reload'),
+    get_text(' §r§b强制更新blh\n'),
+    get_text(f'§7   {Prefix} setpyver', '§b设置python启动命令', f'{Prefix} reload'),
+    get_text(' §r§b设置启动命令'),
 )
 
 
@@ -155,7 +160,17 @@ def blh(server, info, args):
     test_file(server, info.player)
     selfname = args[2]
     stopflag = True
-    p = Popen('python3 demo.py {0} True'.format(roomid), stdout = PIPE, shell = True, bufsize = 1, close_fds = ON_POSIX, cwd = 'plugins/blh')
+    f = open('plugins/blh/pyver', 'r')
+    Pystartcmd = f.read().split('=')
+    if len(Pystartcmd) != 2:
+        dm_logger(server, datahead.format('Err') + '§e没有python启动命令!')
+        dm_logger(server, datahead.format('info') + '§e输入 !!blh setpyver [版本] 来设置')
+        dm_logger(server, datahead.format('info') + '§e示例: !!blh setpyver python3')
+        return
+    Pystartcmd = Pystartcmd[1]
+    Pystartcmd = Pystartcmd.replace('\r', '')
+    Pystartcmd = Pystartcmd.replace('\n', '')
+    p = Popen('{0} demo.py {1} True'.format(Pystartcmd, roomid), stdout = PIPE, shell = True, bufsize = 1, close_fds = ON_POSIX, cwd = 'plugins/blh')
     dm_logger(server, '§cBlhControlThread§r/§e{0}§r §a blh is running at pid {1}'.format('info', str(p.pid)))
     q = Queue()
     t = Thread(target=enqueue_output, args=(p.stdout, q))
@@ -239,6 +254,7 @@ def test_file(server, player):
     fileblhdm = Path('plugins/blh/blivedm.py')
     fileconf = Path('plugins/blh/config.conf')
     filever = Path('plugins/blh/ver')
+    filepyver = Path('plugins/blh/pyver')
 
     dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查Blhlibs完整性: {1}'.format('load', 'blh.dir'), player)
     if filedir.is_dir() is not True:
@@ -264,6 +280,17 @@ def test_file(server, player):
             dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', '版本文件'), player)
             dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在建立文件: {1}'.format('load', '版本文件'), player)
             os.mknod('plugins/blh/ver')
+            f = open('plugins/blh/ver', 'w')
+            f.write('python')
+        except:
+            pass
+
+    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查python启动命令: {1}'.format('load', 'python'), player)
+    if filepyver.is_file() is not True:
+        try:
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', '启动命令配置'), player)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在建立文件: {1}'.format('load', '启动命令配置'), player)
+            os.mknod('plugins/blh/pyver')
             f = open('plugins/blh/ver', 'w')
             f.write('0')
         except:
@@ -506,7 +533,18 @@ def on_info(server, info):
             url = rooturl + '/msg'
             http = urllib3.PoolManager()
             res = http.request('GET', url)
-            server.say(str(res.data, encoding='utf-8')) 
+            server.say(str(res.data, encoding='utf-8'))
+        elif len(startargs) == 3 and startargs[1] == 'vmsg':
+            if startargs[2] == '1':
+                url = rooturl + '/msg'
+                http = urllib3.PoolManager()
+                res = http.request('GET', url)
+                server.say(str(res.data, encoding='utf-8'))
+            elif startargs[2] == '2':
+                url = rooturl + '/msg2'
+                http = urllib3.PoolManager()
+                res = http.request('GET', url)
+                server.say(str(res.data, encoding='utf-8'))
         elif len(startargs) == 3 and startargs[1] == 'pop':
             try:
                 roomnames.index(startargs[2])
@@ -527,5 +565,15 @@ def on_info(server, info):
                 dm_logger(server, line)
         elif len(startargs) == 2 and startargs[1] == 'cmds':
             server.tell(info.player, easycmds)
+        elif len(startargs) == 3 and startargs[1] == 'setpyver':
+            f = open('plugins/blh/pyver', 'w')
+            f.write('python=' + startargs[2] + '\r')
+            dm_logger_tell(server, '写入成功!', info.player)
+        elif len(startargs) == 2 and startargs[1] == 'ud':
+            f = open('plugins/blh/ver', 'w')
+            f.write('1')
+            f.close()
+            time.sleep(1.5)
+            check_update(server, info.player)
         else:
             dm_logger_tell(server, datahead.format('Warn') + '参数错误, 请!!blh help查看帮助')
