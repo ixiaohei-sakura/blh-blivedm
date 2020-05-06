@@ -7,17 +7,20 @@ import time
 from pathlib import Path
 import urllib3
 from utils.rtext import *
+import json
 
 Prefix = '!!blh'
 datahead = '§cBlhControlThread§r/§e{0} §r'
 cmd = '!!blh'
-rooturl = 'bs.s1.blackserver.cn:8900'
+rooturl = 'https://gitee.com/ixiaohei-sakura/WebsocketBlh/raw/master'
+debug = 'False'
 stopName = ''
 ON_POSIX = 'posix' in sys.builtin_module_names
 popu = []
 roomnames = []
 stopflag = True
 ud = False
+isuding = 'True'
 
 helpmsg = '''§e-------------WebSocketBlhClient--help-------------
 {0} cmds: §b命令交互列表(ClickEvent)
@@ -28,7 +31,7 @@ helpmsg = '''§e-------------WebSocketBlhClient--help-------------
 {0} start [名称]: §b启动一个在配置文件blhClient
 {0} stop [名称]: §b停止一个正在运行的blhClient
 {0} stop all: §b停止所有正在运行的blhClient
-§e-------------------页2/1--------------------'''.format('§n§7' + cmd)
+§e-------------------页3/1--------------------'''.format('§n§7' + cmd)
 
 helpmsg_2 = '''§e-------------WebSocketBlhClient--help-------------
 {0} pop [名称]: §b关闭/开启 一个已经启动的blh的人气
@@ -39,7 +42,32 @@ helpmsg_2 = '''§e-------------WebSocketBlhClient--help-------------
 {0} reload: §b重载此插件的内容(一般用不到)
 {0} checkud: §b检查版本更新
 {0} ud: §b强制更新(不管是不是最新版本)
-§e-------------------页2/2------------------------'''.format('§n§7' + cmd)
+§e-------------------页3/2------------------------'''.format('§n§7' + cmd)
+
+helpmsg_3 = '''§e-------------WebSocketBlhClient--help-------------
+{0} pip [您的pip安装命令]: §b安装BlhClient所需要的库文件
+{0} setpyver [您的python命令]: §b设置py命令, 如: python3
+{0} killall: §b杀死所有可能的僵尸子进程
+{0} debug: §b开启/关闭 调试模式
+{0} 待补充: §b待补充
+{0} 待补充: §b待补充
+{0} 待补充: §b待补充
+{0} 待补充: §b待补充
+§e-------------------页3/3------------------------'''.format('§n§7' + cmd)
+
+class Version(object):
+    def __init__(self, nowversion, version, status, init):
+        if version.find('alpha') or version.find('beta'):
+            self.isalpha = True
+        else: self.isalpha = False
+        self.version = version
+        self.nowver = nowversion
+        self.status = status
+        url = rooturl + '/au'
+        http = urllib3.PoolManager()
+        res = http.request('GET', url)
+        self.au = str(res.data, encoding='utf-8').replace('\r', '')
+        
 
 def get_text(text, mous='', cickrun='', color=RColor.white, run=True):
     if mous != '':
@@ -88,12 +116,18 @@ easycmds = RTextList(
     get_text(' §r§b版本信息查看\n'),
     get_text(f'§7   {Prefix} reload', '§b重载blh', f'{Prefix} reload'),
     get_text(' §r§b重载blh\n'),
-    get_text(f'§7   {Prefix} checkud', '§b检查版本更新', f'{Prefix} reload'),
+    get_text(f'§7   {Prefix} checkud', '§b检查版本更新', f'{Prefix} checkud'),
     get_text(' §r§b更新blh\n'),
-    get_text(f'§7   {Prefix} ud', '§b强制更新', f'{Prefix} reload'),
+    get_text(f'§7   {Prefix} ud', '§b强制更新', f'{Prefix} ud'),
     get_text(' §r§b强制更新blh\n'),
-    get_text(f'§7   {Prefix} setpyver', '§b设置python启动命令', f'{Prefix} reload'),
-    get_text(' §r§b设置启动命令'),
+    get_text(f'§7   {Prefix} setpyver', '§b设置python启动命令', f'{Prefix} setpyver', run=False),
+    get_text(' §r§b设置启动命令\n'),
+    get_text(f'§7   {Prefix} pip', '§b安装库文件', f'{Prefix} pip ', run=False),
+    get_text(' §r§b安装库文件\n'),
+    get_text(f'§7   {Prefix} killall', '§b强制停止', f'{Prefix} killall'),
+    get_text(' §r§b强制停止blh\n'),
+    get_text(f'§7   {Prefix} debug', '§b调试模式', f'{Prefix} debug'),
+    get_text(' §r§b调试模式'),
 )
 
 
@@ -147,17 +181,30 @@ def remove(key):
     except:
         return False
 
+def loadpyver():
+    f = open('plugins/blh/pyver', 'r')
+    Pystartcmd = f.read().split('=')
+    Pystartcmd = Pystartcmd[1]
+    Pystartcmd = Pystartcmd.replace('\r', '')
+    Pystartcmd = Pystartcmd.replace('\n', '')
+    class returnObj(object):
+        def __init__(self, Pystartcmd):
+            self.cmd = Pystartcmd
+    return returnObj(Pystartcmd)
 
 
 def blh(server, info, args):
-    global stopflag, stopName
+    global stopflag, stopName, debug
     roomid = load(args[2])
     if roomid is None:
         dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a key not found'.format('info'), info.player)
         return
     if test_blh_isrunning(server, info.player, args[2]) is True:
         return
-    test_file(server, info.player)
+    if debug == 'False':
+        test_file(server, 'None')
+    elif debug == 'True':
+        test_file(server, info.player)
     selfname = args[2]
     stopflag = True
     f = open('plugins/blh/pyver', 'r')
@@ -192,7 +239,7 @@ def blh(server, info, args):
                 break
             try:
                 line = q.get_nowait()
-            except Empty:
+            except Empty:  
                 pass
             else:
                 try:
@@ -236,7 +283,6 @@ def dm_logger_tell(server, buff, player = '@a'):
     server.tell(player, '§b[§cBLH§r§b]§r ' + buff)
 
 
-
 def test_blh_isrunning(server, player, name):
     global stopflag, roomnames
     try:
@@ -249,58 +295,80 @@ def test_blh_isrunning(server, player, name):
         return True
 
 def test_file(server, player):
+    global debug
+    if debug == 'True':
+        server.say(f'var player: {player}')
+        server.say(f'var debug: {debug}')
+    if debug == 'False':
+        player_ = 'None'
+    elif debug == 'True':
+        player_ = player
+    if debug == 'True':
+        server.say('{0}var player_: {1}'.format(datahead.format('debug'), player_))
     filedir = Path('plugins/blh')
     filedemo = Path('plugins/blh/demo.py')
     fileblhdm = Path('plugins/blh/blivedm.py')
     fileconf = Path('plugins/blh/config.conf')
     filever = Path('plugins/blh/ver')
     filepyver = Path('plugins/blh/pyver')
+    fileDebug = Path('plugins/blh/debugMode')
 
-    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查Blhlibs完整性: {1}'.format('load', 'blh.dir'), player)
+    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查Blhlibs完整性: {1}'.format('load', 'blh.dir'), player_)
     if filedir.is_dir() is not True:
         try:
-            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', 'blh.dir'), player)
-            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在建立文件夹: {1}'.format('load', 'blh.dir'), player)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', 'blh.dir'), player_)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在新建文件夹: {1}'.format('load', 'blh.dir'), player_)
             os.mkdir('plugins/blh')
         except:
             pass
 
-    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查conf完整性: {1}'.format('load', 'version'), player)
+    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查conf完整性: {1}'.format('load', 'version'), player_)
     if fileconf.is_file() is not True:
         try:
-            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', 'config.conf'), player)
-            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在建立文件: {1}'.format('load', 'config.conf'), player)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', 'config.conf'), player_)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在新建文件: {1}'.format('load', 'config.conf'), player_)
             os.mknod('plugins/blh/config.conf')
         except:
             pass
 
-    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查版本文件完整性: {1}'.format('load', 'config.conf'), player)
+    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查版本文件完整性: {1}'.format('load', 'config.conf'), player_)
     if filever.is_file() is not True:
         try:
-            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', '版本文件'), player)
-            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在建立文件: {1}'.format('load', '版本文件'), player)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', '版本文件'), player_)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在新建文件: {1}'.format('load', '版本文件'), player_)
             os.mknod('plugins/blh/ver')
             f = open('plugins/blh/ver', 'w')
             f.write('python')
         except:
             pass
 
-    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查python启动命令: {1}'.format('load', 'python'), player)
+    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查Debug文件完整性: {1}'.format('load', 'Debug'), player_)
+    if fileDebug.is_file() is not True:
+        try:
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', 'Debug文件'), player_)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在新建文件: {1}'.format('load', 'Debug文件'), player_)
+            os.mknod('plugins/blh/debugMode')
+            f = open('plugins/blh/debugMode', 'w')
+            f.write('False')
+        except:
+            pass
+
+    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查python启动命令: {1}'.format('load', 'python'), player_)
     if filepyver.is_file() is not True:
         try:
-            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', '启动命令配置'), player)
-            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在建立文件: {1}'.format('load', '启动命令配置'), player)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', '启动命令配置'), player_)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在新建文件: {1}'.format('load', '启动命令配置'), player_)
             os.mknod('plugins/blh/pyver')
             f = open('plugins/blh/ver', 'w')
             f.write('0')
         except:
             pass
 
-    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查Blhlibs完整性: {1}'.format('load', 'demo.py'), player)
+    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查Blhlibs完整性: {1}'.format('load', 'demo.py'), player_)
     if filedemo.is_file() is not True:
         try:
-            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', 'demo.py'), player)
-            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在下载文件: {1}'.format('load', 'demo.py'), player)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', 'demo.py'), player_)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在下载文件: {1}'.format('load', 'demo.py'), player_)
             urldemopy = rooturl + '/demo.py'
             http = urllib3.PoolManager()
             res = http.request('GET', urldemopy)
@@ -309,11 +377,11 @@ def test_file(server, player):
         except:
             pass
 
-    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查Blhlibs完整性: {1}'.format('load', 'blivedm.py'), player)
+    dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在检查Blhlibs完整性: {1}'.format('load', 'blivedm.py'), player_)
     if fileblhdm.is_file() is not True:
         try:
-            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', 'blivedm.py'), player)
-            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在下载文件: {1}'.format('load', 'blivedm.py'), player)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 未找到文件: {1}'.format('load', 'blivedm.py'), player_)
+            dm_logger_tell(server, '§cBlhControlThread§r/§e{0}§r §a 正在下载文件: {1}'.format('load', 'blivedm.py'), player_)
             urlblivedm = rooturl + '/blivedm.py'
             http = urllib3.PoolManager()
             res = http.request('GET', urlblivedm)
@@ -325,15 +393,25 @@ def test_file(server, player):
 def check_update(server, player):
     global roomnames, stopflag
     dm_logger(server, '检查更新中,请耐心等待.期间请勿重载插件!')
+
     url = rooturl + '/ver'
     http = urllib3.PoolManager()
     res = http.request('GET', url)
+
     f = open('plugins/blh/ver', 'r')
     ver = f.read()
-    if int(res.data) > int(ver):
+
+    if str(ver) == str(0):
+        return Version(ver, str(res.data, encoding='utf-8'), 0, True)
+    elif str(ver) != str(res.data, encoding='utf-8'):
+        return Version(ver, str(res.data, encoding='utf-8'), 1, False)
+    elif str(ver) == str(res.data, encoding='utf-8'):
+        return Version(ver, str(res.data, encoding='utf-8'), 2, False)
+    else: return Version(ver, str(res.data, encoding='utf-8'), 3, False)
+
+def download_update(server, player):
+        global roomnames, stopflag
         try:
-            dm_logger(server, '有新版本的Blh可用!')
-            dm_logger(server, '最新版本为: {0}.0.0'.format(str(res.data, encoding='utf-8')))
             time.sleep(1.5)
             dm_logger(server, datahead.format('info') + '停止所有房间')
             roomnames = []
@@ -374,13 +452,30 @@ def check_update(server, player):
             server.load_plugin('BlhClient.py')
         except:
             dm_logger(server, datahead.format('Err') + '检测更新: 失败(请检查网络)')
-    else:
-        dm_logger(server, 'blh已经是最新版本!')
-        dm_logger(server, '目前版本: v{0}.0.0'.format(str(res.data, encoding='utf-8')))
-        url = rooturl + '/msg'
-        http = urllib3.PoolManager()
-        res = http.request('GET', url)
-        server.say(str(res.data, encoding='utf-8'))
+
+def update(server, player):
+    global isuding
+    data = check_update(server, player)
+    if data.status == 0:
+        dm_logger_tell(server, datahead.format('info') + '检测到第一次启动, 准备初始化', player)
+        download_update(server, player)
+    elif data.status == 1:
+        dm_logger_tell(server, '有新版本!', player)
+        server.tell(player, f'   作者: {data.au}')
+        time.sleep(0.1)
+        server.tell(player, f'   版本: {data.version}')
+        time.sleep(0.1)
+        server.tell(player, f'   现在版本: {data.nowver}')
+        time.sleep(0.1)
+        isuding = True
+        JsonData = [{"text":"更▇新","color":"dark_green","clickEvent":{"action":"run_command","value":"!!blh startud"},"hoverEvent":{"action":"show_text","value":"启动更新"}},{"text":"      "},{"text":"取▇消","color":"dark_red","clickEvent":{"action":"run_command","value":"!!blh cud"},"hoverEvent":{"action":"show_text","value":"取消更新"}}]
+        JsonData = json.dumps(JsonData)
+        server.execute(f'tellraw {player} {JsonData}')
+    elif data.status == 2:
+        dm_logger_tell(server, '版本最新, 不需要更新!', player)
+        dm_logger_tell(server, '强制更新请输入 !!blh ud', player)
+    elif data.status == 3:
+        dm_logger_tell(server, '未知错误! 检查控制台.', player)
 
 
 
@@ -389,7 +484,7 @@ def on_server_stop(server):
     roomnames = []
     stopflag = False
     try:
-        os.system('ps aux|grep "python3 demo.py"|grep -v grep|cut -c 9-15|xargs kill -15')
+        os.system('ps aux|grep "{0} demo.py"|grep -v grep|cut -c 9-15|xargs kill -15'.format(loadpyver().cmd))
     except:
         pass
 
@@ -398,7 +493,7 @@ def on_mcdr_stop(server):
     roomnames = []
     stopflag = False
     try:
-        os.system('ps aux|grep "python3 demo.py"|grep -v grep|cut -c 9-15|xargs kill -15')
+        os.system('ps aux|grep "{0} demo.py"|grep -v grep|cut -c 9-15|xargs kill -15'.format(loadpyver().cmd))
     except:
         pass
 
@@ -407,12 +502,12 @@ def on_unload(server):
     roomnames = []
     stopflag = False
     try:
-        os.system('ps aux|grep "python3 demo.py"|grep -v grep|cut -c 9-15|xargs kill -15')
+        os.system('ps aux|grep "{0} demo.py"|grep -v grep|cut -c 9-15|xargs kill -15'.format(loadpyver().cmd))
     except:
         pass
 
 def on_load(server, old):
-    global stopflag, popu, roomnames
+    global stopflag, popu, roomnames, debug
     server.add_help_message('!!blh', 'BiliBili弹幕姬')
     test_file(server, '@a')
     os.system('chmod 777 plugins/BlhClient.py')
@@ -428,7 +523,9 @@ def on_load(server, old):
         url = rooturl + '/msg'
         http = urllib3.PoolManager()
         res = http.request('GET', url)
-        server.say(str(res.data, encoding='utf-8'))
+        server.say(str(res.data, encoding='utf-8').replace('\r', ''))
+    else:
+        update(server, '@a')
 
     try:
         f = open('plugins/blh/ver', 'r')
@@ -444,12 +541,15 @@ def on_load(server, old):
             dm_logger(server, '检测到第一次启动, 准备初始化')
             time.sleep(1.5)
             test_file(server, '@a')
-            check_update(server, '@a')
+            update(server, '@a')
+
+    debug = open('plugins/blh/debugMode', 'r').read()
+    dm_logger(server, '重载成功')
 
 
 
 def on_info(server, info):
-    global stopflag, popu, roomnames, stopName
+    global stopflag, popu, roomnames, stopName, isuding, debug
     if info.content.startswith('!!blh'):
         startargs = info.content.split(' ')
         if len(startargs) == 1:
@@ -460,8 +560,9 @@ def on_info(server, info):
             if startargs[2] == '1':
                 printHelp(server, info.player, helpmsg)
             elif startargs[2] == '2':
-                server.tell(info.player, '\n')
                 printHelp(server, info.player, helpmsg_2)
+            elif startargs[2] == '3':
+                printHelp(server, info.player, helpmsg_3)
             else:
                 printHelp(server, info.player, helpmsg)
         elif len(startargs) == 4 and startargs[1] == 'add':
@@ -494,10 +595,6 @@ def on_info(server, info):
                     for line in roomnames:
                         dm_logger(server, line)
                     roomnames = []
-                    try:
-                        os.system('ps aux|grep "python3 demo.py"|grep -v grep|cut -c 9-15|xargs kill -15')
-                    except:
-                        pass
                 else:
                     dm_logger(server, datahead.format('Warn') + '没有房间可以被取消订阅')
             elif startargs[2] != 'all':
@@ -518,10 +615,6 @@ def on_info(server, info):
                 stopflag = True
                 dm_logger(server, '已取消订阅{0}房间'.format('所有'))
                 roomnames = []
-                try:
-                    os.system('ps aux|grep "python3 demo.py"|grep -v grep|cut -c 9-15|xargs kill -15')
-                except:
-                    pass
             server.load_plugin("BlhClient.py")
         elif len(startargs) == 2 and startargs[1] == 'checkud':
             check_update(server, info.player)
@@ -533,18 +626,18 @@ def on_info(server, info):
             url = rooturl + '/msg'
             http = urllib3.PoolManager()
             res = http.request('GET', url)
-            server.say(str(res.data, encoding='utf-8'))
+            server.say(str(res.data, encoding='utf-8').replace('\r', ''))
         elif len(startargs) == 3 and startargs[1] == 'vmsg':
             if startargs[2] == '1':
                 url = rooturl + '/msg'
                 http = urllib3.PoolManager()
                 res = http.request('GET', url)
-                server.say(str(res.data, encoding='utf-8'))
+                server.say(str(res.data, encoding='utf-8').replace('\r', ''))
             elif startargs[2] == '2':
                 url = rooturl + '/msg2'
                 http = urllib3.PoolManager()
                 res = http.request('GET', url)
-                server.say(str(res.data, encoding='utf-8'))
+                server.say(str(res.data, encoding='utf-8').replace('\r', ''))
         elif len(startargs) == 3 and startargs[1] == 'pop':
             try:
                 roomnames.index(startargs[2])
@@ -569,11 +662,44 @@ def on_info(server, info):
             f = open('plugins/blh/pyver', 'w')
             f.write('python=' + startargs[2] + '\r')
             dm_logger_tell(server, '写入成功!', info.player)
+        elif len(startargs) == 2 and startargs[1] == 'killall':
+            try:
+                os.system('ps aux|grep "{0} demo.py"|grep -v grep|cut -c 9-15|xargs kill -15'.format(loadpyver().cmd))
+            except:
+                pass
+            dm_logger_tell(server, '已经杀死所有demo.py进程')
         elif len(startargs) == 2 and startargs[1] == 'ud':
-            f = open('plugins/blh/ver', 'w')
-            f.write('1')
-            f.close()
-            time.sleep(1.5)
-            check_update(server, info.player)
+            download_update(server, info.player)
+        elif len(startargs) == 2 and startargs[1] == 'startud' and isuding == True:
+            isuding = False
+            dm_logger_tell(server, '开始更新', info.player)
+            download_update(server, info.player)
+        elif len(startargs) == 2 and startargs[1] == 'cud' and isuding == True:
+            dm_logger_tell(server, '已取消', info.player)
+        elif len(startargs) ==2:
+            if debug == 'False':
+                f = open('plugins/blh/debugMode', 'w')
+                f.write('True')
+                f.close()
+                f = open('plugins/blh/debugMode', 'r')
+                debug = f.read()
+                dm_logger_tell(server, f'调试模式: {debug}', info.player)
+                f.close()
+            elif debug == 'True':
+                f = open('plugins/blh/debugMode', 'w')
+                f.write('False')
+                f.close()
+                f = open('plugins/blh/debugMode', 'r')
+                debug = f.read()
+                dm_logger_tell(server, f'调试模式: {debug}', info.player)
+                f.close()
+        elif len(startargs) == 3 and startargs[1] == 'pip':
+            dm_logger(server, '正在安装库...')
+            try:
+                os.system(f'{startargs[2]} install asyncio')
+            except:
+                dm_logger(server, '安装失败!')
+            else:
+                dm_logger(server, '安装成功!')
         else:
             dm_logger_tell(server, datahead.format('Warn') + '参数错误, 请!!blh help查看帮助')
