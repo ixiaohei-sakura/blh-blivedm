@@ -467,6 +467,8 @@ def update(server, player):
         time.sleep(0.1)
         server.tell(player, f'   现在版本: {data.nowver}')
         time.sleep(0.1)
+        server.tell(player, f'   是否为测试版本: {data.isalpha}')
+        time.sleep(0.1)
         isuding = True
         JsonData = [{"text":"更▇新","color":"dark_green","clickEvent":{"action":"run_command","value":"!!blh startud"},"hoverEvent":{"action":"show_text","value":"启动更新"}},{"text":"      "},{"text":"取▇消","color":"dark_red","clickEvent":{"action":"run_command","value":"!!blh cud"},"hoverEvent":{"action":"show_text","value":"取消更新"}}]
         JsonData = json.dumps(JsonData)
@@ -527,6 +529,8 @@ def on_load(server, old):
         time.sleep(3)
         dm_logger(server, '如果您没有安装过asyncio, 请输入:')
         dm_logger(server, '!!blh pip [pip命令], 或查看help')
+        debug = open('plugins/blh/debugMode', 'r').read()
+        return
     else:
         update(server, '@a')
 
