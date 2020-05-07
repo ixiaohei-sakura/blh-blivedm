@@ -1,6 +1,6 @@
 import sys
 from subprocess import PIPE, Popen, run
-from threading  import Thread
+from threading  import Thread, Timer
 from queue import Queue, Empty
 import os
 import time
@@ -15,12 +15,14 @@ cmd = '!!blh'
 rooturl = 'https://gitee.com/ixiaohei-sakura/WebsocketBlh/raw/master'
 debug = 'False'
 stopName = ''
+isuding = 'True'
 ON_POSIX = 'posix' in sys.builtin_module_names
 popu = []
 roomnames = []
 stopflag = True
+udstopflag = True
 ud = False
-isuding = 'True'
+update_timer = None
 
 helpmsg = '''§e-------------WebSocketBlhClient--help-------------
 {0} cmds: §b命令交互列表(ClickEvent)
@@ -136,6 +138,25 @@ def printHelp(server, player, msg):
     for line in msg.splitlines():
         if line != '\n' and line != '\r' and line != '':
             server.tell(player, line)
+
+
+
+def check_update_timer(server):
+    url = rooturl + '/ver'
+    http = urllib3.PoolManager()
+    res = http.request('GET', url)
+
+    ver = open('plugins/blh/ver', 'r')
+    ver.read()
+
+    if ver != res.data:
+        update(server, '@a')
+
+    if udstopflag == False:
+        return
+    update_timer = Timer(300, check_update_timer, [server])
+    update_timer.setDaemon(True)
+    update_timer.start()
 
 
 
@@ -297,8 +318,8 @@ def test_blh_isrunning(server, player, name):
 def test_file(server, player):
     global debug
     if debug == 'True':
-        server.say(f'var player: {player}')
-        server.say(f'var debug: {debug}')
+        server.say('{0}var player: {1}'.format(datahead.format('debug'), player))
+        server.say('{0}var debug: {1}'.format(datahead.format('debug'), debug))
     if debug == 'False':
         player_ = 'None'
     elif debug == 'True':
@@ -482,7 +503,9 @@ def update(server, player):
 
 
 def on_server_stop(server):
-    global stopflag, popu, roomnames
+    global stopflag, popu, roomnames, update_timer, udstopflag
+    udstopflag = False
+    update_timer.cancel()
     roomnames = []
     stopflag = False
     try:
@@ -491,7 +514,8 @@ def on_server_stop(server):
         pass
 
 def on_mcdr_stop(server):
-    global stopflag, popu, roomnames
+    global stopflag, popu, roomnames, update_timer
+    update_timer.cancel()
     roomnames = []
     stopflag = False
     try:
@@ -500,16 +524,21 @@ def on_mcdr_stop(server):
         pass
 
 def on_unload(server):
-    global stopflag, popu, roomnames
+    global stopflag, popu, roomnames, update_timer, udstopflag
+    udstopflag = False
     roomnames = []
     stopflag = False
+    update_timer.cancel()
     try:
         os.system('ps aux|grep "{0} demo.py"|grep -v grep|cut -c 9-15|xargs kill -15'.format(loadpyver().cmd))
     except:
         pass
 
 def on_load(server, old):
-    global stopflag, popu, roomnames, debug
+    global stopflag, popu, roomnames, debug, update_timer
+    update_timer = Timer(300, check_update_timer, [server])
+    update_timer.setDaemon(True)
+    update_timer.start()
     server.add_help_message('!!blh', 'BiliBili弹幕姬')
     test_file(server, '@a')
     os.system('chmod 777 plugins/BlhClient.py')
