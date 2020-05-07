@@ -151,10 +151,19 @@ def check_update_timer(server):
 
     if ver != res.data:
         update(server, '@a')
+        try:
+            update_timer.cancel()
+            update_timer = None
+        except:pass
         return
 
     if udstopflag == False:
+        try:
+            update_timer.cancel()
+            update_timer = None
+        except:pass
         return
+
     update_timer = Timer(300, check_update_timer, [server])
     update_timer.setDaemon(True)
     update_timer.start()
@@ -546,23 +555,25 @@ def on_load(server, old):
     os.system('chmod 777 plugins/blh/*')
     os.system('chmod 777 plugins/blh')
     
-    if old.ud == True:
-        dm_logger(server, 'blh已经更新到最新版本!')
-        f = open('plugins/blh/ver', 'r')
-        ver = f.read()
-        dm_logger(server, '版本: {0}'.format(ver))
-        dm_logger(server, 'blh已经是最新版本!')
-        url = rooturl + '/msg'
-        http = urllib3.PoolManager()
-        res = http.request('GET', url)
-        server.say(str(res.data, encoding='utf-8').replace('\r', ''))
-        time.sleep(3)
-        dm_logger(server, '如果您没有安装过asyncio, 请输入:')
-        dm_logger(server, '!!blh pip [pip命令], 或查看help')
-        debug = open('plugins/blh/debugMode', 'r').read()
-        return
-    else:
-        update(server, '@a')
+    try:
+        if old.ud == True:
+            dm_logger(server, 'blh已经更新到最新版本!')
+            f = open('plugins/blh/ver', 'r')
+            ver = f.read()
+            dm_logger(server, '版本: {0}'.format(ver))
+            dm_logger(server, 'blh已经是最新版本!')
+            url = rooturl + '/msg'
+            http = urllib3.PoolManager()
+            res = http.request('GET', url)
+            server.say(str(res.data, encoding='utf-8').replace('\r', ''))
+            time.sleep(3)
+            dm_logger(server, '如果您没有安装过asyncio, 请输入:')
+            dm_logger(server, '!!blh pip [pip命令], 或查看help')
+            debug = open('plugins/blh/debugMode', 'r').read()
+            return
+        else:
+            update(server, '@a')
+    except:pass
 
     try:
         f = open('plugins/blh/ver', 'r')
