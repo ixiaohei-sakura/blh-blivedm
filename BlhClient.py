@@ -151,6 +151,7 @@ def check_update_timer(server):
 
     if ver != res.data:
         update(server, '@a')
+        return
 
     if udstopflag == False:
         return
