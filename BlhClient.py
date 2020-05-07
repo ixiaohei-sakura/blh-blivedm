@@ -120,7 +120,7 @@ easycmds = RTextList(
     get_text(' §r§b更新blh\n'),
     get_text(f'§7   {Prefix} ud', '§b强制更新', f'{Prefix} ud'),
     get_text(' §r§b强制更新blh\n'),
-    get_text(f'§7   {Prefix} setpyver', '§b设置python启动命令', f'{Prefix} setpyver', run=False),
+    get_text(f'§7   {Prefix} setpyver', '§b设置python启动命令', f'{Prefix} setpyver ', run=False),
     get_text(' §r§b设置启动命令\n'),
     get_text(f'§7   {Prefix} pip', '§b安装库文件', f'{Prefix} pip ', run=False),
     get_text(' §r§b安装库文件\n'),
@@ -518,12 +518,15 @@ def on_load(server, old):
         dm_logger(server, 'blh已经更新到最新版本!')
         f = open('plugins/blh/ver', 'r')
         ver = f.read()
-        dm_logger(server, '版本: v{0}.0.0'.format(ver))
+        dm_logger(server, '版本: {0}'.format(ver))
         dm_logger(server, 'blh已经是最新版本!')
         url = rooturl + '/msg'
         http = urllib3.PoolManager()
         res = http.request('GET', url)
         server.say(str(res.data, encoding='utf-8').replace('\r', ''))
+        time.sleep(3)
+        dm_logger(server, '如果您没有安装过asyncio, 请输入:')
+        dm_logger(server, '!!blh pip [pip命令], 或查看help')
     else:
         update(server, '@a')
 
@@ -534,14 +537,14 @@ def on_load(server, old):
         dm_logger(server, datahead.format('info') + '检测到第一次启动, 准备初始化')
         time.sleep(1.5)
         test_file(server, '@a')
-        check_update(server, '@a')
+        download_update(server, '@a')
     else:
         if f.read() == '0':
             time.sleep(1.5)
             dm_logger(server, '检测到第一次启动, 准备初始化')
             time.sleep(1.5)
             test_file(server, '@a')
-            update(server, '@a')
+            download_update(server, '@a')
 
     debug = open('plugins/blh/debugMode', 'r').read()
     dm_logger(server, '重载成功')
@@ -621,7 +624,7 @@ def on_info(server, info):
         elif len(startargs) == 2 and startargs[1] == 'v':
             f = open('plugins/blh/ver', 'r')
             ver = f.read()
-            dm_logger(server, '当前版本: v{0}.0.0'.format(ver))
+            dm_logger(server, '当前版本: {0}'.format(ver))
         elif len(startargs) == 2 and startargs[1] == 'vmsg':
             url = rooturl + '/msg'
             http = urllib3.PoolManager()
@@ -696,9 +699,17 @@ def on_info(server, info):
         elif len(startargs) == 3 and startargs[1] == 'pip':
             dm_logger(server, '正在安装库...')
             try:
+                piptmp = Popen(f'{startargs[2]} list', stdout=PIPE, stderr=PIPE, shell=True)
+                tmpbuff = str(piptmp.stdout.read(), encoding='utf-8')
+                piptmp.kill()
+                if tmpbuff.find('asyncio'):
+                    dm_logger_tell(server, '此库已经被安装过了, 无需再次安装!')
+                    return
                 os.system(f'{startargs[2]} install asyncio')
-            except:
-                dm_logger(server, '安装失败!')
+            except Exception as exception:
+                dm_logger(server, '安装失败!详情信息查看控制台或debug')
+                if debug == 'True':
+                    dm_logger_tell(server, datahead.format('debug')+f'原因: {exception}', info.player)
             else:
                 dm_logger(server, '安装成功!')
         else:
