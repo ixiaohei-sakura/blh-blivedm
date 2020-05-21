@@ -2,12 +2,19 @@ import socket
 import time
 from threading import Thread
 
+###########可更改常量开始###########
+id = 'Creative'
+selfaddr = '127.0.0.1'
+minPort = 1000
+maxPort = 9999
+###########可更改常量结束###########
+
 stopFlag = True
 Client_thread = None
-id = 'Creative'
 s = socket.socket()
-restart_num = 100
-restart_counter = 0
+randomPort = minPort
+ADDRESS = (selfaddr, randomPort)
+try_start: Thread
 
 class ServerStatus(object):
     def __init__(self, server_is_alive, is_server_stop):
@@ -34,19 +41,24 @@ def recvServer(server):
         except: pass
     return
 
-
-
 def init_Client(server):
-    global Client_thread
+    global ADDRESS, randomPort
     try:
-        s.connect(('127.0.0.1', 8812))
+        while True:
+            try:
+                s.connect(ADDRESS)
+            except:
+                randomPort += 1
+                s.close
+            else:
+                ADDRESS = (selfaddr, randomPort)
+                break
         server.say(s.recv(2048).decode(encoding='utf8'))
         s.sendall(bytes('[id]:{0}\n'.format(id), encoding='UTF-8'))
         time.sleep(0.5)
         s.sendall("Blh客户端启动成功!".encode('utf8'))
         s.setblocking(False)
-    except Exception as exc:
-        server.say('启动失败!原因: {0}'.format(exc))
+    except:
         return False
     Client_thread = Thread(target=recvServer, args=[server])
     Client_thread.setDaemon(True)
@@ -62,40 +74,39 @@ def stop_all():
 
     try:
         Client_thread.join(0.0)
+        try_start.join(0.0)
     except:pass
     return
 
-
+def init_loop(server):
+    while True:
+        if init_Client(server) == True:
+            break
+        time.sleep(1)
 
 def on_load(server, old):
-    global restart_counter
-    if init_Client(server) == False:
-        stop_all()
-        time.sleep(1)
-        try:restart_counter = old.restart_counter+1
-        except:pass
-        if restart_counter <= restart_num:
-            server.load_plugin('BlhSocketClient.py')
-        else:
-            restart_counter = 0
-            return
-    else:restart_counter = 0
+    global try_start
+    try_start = Thread(target=init_loop, args=[server])
+    try_start.start()
 
 def on_unload(server):
     stop_all()
 
+def on_server_stop(server, __):
+    stop_all()
+
+def on_mcdr_stop(server):
+    stop_all()
+
 def on_info(server, info):
-    global restart_counter
     if info.content.startswith('!!blh'):
         args = info.content.split(' ')
         if len(args) == 2 and args[1] == 'reload':
-            restart_counter = 0
             stop_all()
             server.say('正在重载')
             time.sleep(2)
             server.load_plugin('BlhSocketClient.py')
-        elif len(args) == 2 and args[1] == 'stopc':
-            restart_counter = 0
+        elif len(args) == 2 and args[1] == 'stop':
             stop_all()
             server.say('已停止BlhSocketClient')
         else:
