@@ -10,7 +10,6 @@ import os
 import time
 import urllib3
 import socket
-import yaml
 
 # Strs
 head = 'Blh'
@@ -870,6 +869,7 @@ def on_unload(server: classmethod):
 
 def on_load(server: classmethod, old: classmethod):
     global stopflag, popu, roomnames, debug, update_timer, g_conn_pool, stop_all_thread, start_socket, selfaddr, minPort, maxPort, randomPort, rooturl
+    check_path(server, '@a')
     rooturl = _read_config()['rooturl']
     selfaddr = _read_config()['socket']['bindaddr']
     minPort = _read_config()['socket']['minport']
@@ -880,7 +880,6 @@ def on_load(server: classmethod, old: classmethod):
     update_timer.setDaemon(True)
     update_timer.start()
     server.add_help_message('!!blh', 'BiliBili弹幕姬')
-    check_path(server, '@a')
     os.system('chmod 777 plugins/BlhClient.py')
     os.system('chmod 777 plugins/blh/*')
     os.system('chmod 777 plugins/blh')
