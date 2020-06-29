@@ -1,4 +1,6 @@
 # WebSocket 哔哩哔哩弹幕姬
+暂时咕咕咕，下一次更新将会加上json传输
+在写MWC owo
 #### [国内下载源] https://gitee.com/ixiaohei-sakura/MCDR-BlhClient
 
 ## 写在前面:
