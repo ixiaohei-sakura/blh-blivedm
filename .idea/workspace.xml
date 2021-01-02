@@ -109,6 +109,7 @@
       <workItem from="1609410652929" duration="3541000" />
       <workItem from="1609419675370" duration="45692000" />
       <workItem from="1609599694108" duration="2327000" />
+      <workItem from="1609603855718" duration="16000" />
     </task>
     <task id="LOCAL-00001" summary="ws库完工">
       <created>1609588031414</created>
@@ -124,7 +125,14 @@
       <option name="project" value="LOCAL" />
       <updated>1609603506044</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="更改一个错误">
+      <created>1609603869726</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1609603869726</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -133,7 +141,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="ws库完工" />
     <MESSAGE value="写完力, 收工睡觉" />
-    <option name="LAST_COMMIT_MESSAGE" value="写完力, 收工睡觉" />
+    <MESSAGE value="更改一个错误" />
+    <option name="LAST_COMMIT_MESSAGE" value="更改一个错误" />
   </component>
   <component name="WindowStateProjectService">
     <state x="313" y="197" width="913" height="634" key="#Log_Highlighting_(ideolog)" timestamp="1609588123744">
@@ -148,10 +157,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="760" y="346" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1080@0.0.1920.1080" timestamp="1609510663065" />
-    <state x="553" y="112" key="CommitChangelistDialog2" timestamp="1609603505812">
+    <state x="553" y="112" key="CommitChangelistDialog2" timestamp="1609603869558">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="553" y="112" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1609603505812" />
+    <state x="553" y="112" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1609603869558" />
     <state width="1878" height="376" key="GridCell.Tab.0.bottom" timestamp="1609599587422">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
