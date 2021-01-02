@@ -2,58 +2,49 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="28c4d2cf-753f-4e33-9a70-baa7e0a5a6d1" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/blh.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/command_manager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/constant.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/exception.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/info.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/language_manager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/logger.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/parser/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/parser/abstract_parser.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/parser/basic_parser.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/parser/bukkit_parser.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/parser/bukkit_parser_14.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/parser/bungeecord_parser.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/parser/cat_server_parser.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/parser/forge_parser.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/parser/vanilla_parser.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/parser/waterfall_parser.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/parser_manager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/permission_manager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/plugin.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/plugin_manager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/plugin_thread.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/rcon.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/rcon_manager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/reactor/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/reactor/base_reactor.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/reactor/general_reactor.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/reactor/player_reactor.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/reactor/server_reactor.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/reactor_manager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/rtext.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/server.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/server_interface.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/server_status.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/tool.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/update_helper.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wsBlhLib/WebsocketBlh.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wsBlhLib/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wsBlhLib/constants.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wsBlhLib/liveRoom.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wsBlhLib/logger.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wsBlhLib/mcdrPluginLib/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wsBlhLib/messages.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wsBlhLib/network.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wsBlhLib/packs.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wsBlhLib/thread_rewrite.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wsBlhLib/configs/config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlhClient.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlhSocketClient.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blh.py" beforeDir="false" afterPath="$PROJECT_DIR$/blh.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/command_manager.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/config.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/constant.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/exception.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/info.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/language_manager.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/logger.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/parser/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/parser/abstract_parser.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/parser/basic_parser.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/parser/bukkit_parser.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/parser/bukkit_parser_14.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/parser/bungeecord_parser.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/parser/cat_server_parser.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/parser/forge_parser.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/parser/vanilla_parser.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/parser/waterfall_parser.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/parser_manager.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/permission_manager.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/plugin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/plugin_manager.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/plugin_thread.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/rcon.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/rcon_manager.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/reactor/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/reactor/base_reactor.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/reactor/general_reactor.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/reactor/player_reactor.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/reactor/server_reactor.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/reactor_manager.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/rtext.py" beforeDir="false" afterPath="$PROJECT_DIR$/wsBlhLib/mcdrPluginLib/rtext.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/server.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/server_interface.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/server_status.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/tool.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/update_helper.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/wsBlhLib/WebsocketBlh.py" beforeDir="false" afterPath="$PROJECT_DIR$/wsBlhLib/WebsocketBlh.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wsBlhLib/mcdrPluginLib/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/wsBlhLib/mcdrPluginLib/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,12 +86,14 @@
     <option name="myUseBundledCoveragePy" value="true" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/wsBlhLib" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/lib" />
       <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/wsBlhLib/configs" />
+      <recent name="$PROJECT_DIR$/wsBlhLib/mcdrPluginLib" />
+      <recent name="$PROJECT_DIR$/wsBlhLib" />
     </key>
   </component>
   <component name="RunManager">
@@ -158,14 +151,31 @@
       <option name="presentableId" value="Default" />
       <updated>1609410651103</updated>
       <workItem from="1609410652929" duration="3541000" />
-      <workItem from="1609419675370" duration="35121000" />
+      <workItem from="1609419675370" duration="45692000" />
+      <workItem from="1609599694108" duration="2296000" />
     </task>
+    <task id="LOCAL-00001" summary="ws库完工">
+      <created>1609588031414</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1609588031414</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="ws库完工" />
+    <option name="LAST_COMMIT_MESSAGE" value="ws库完工" />
+  </component>
   <component name="WindowStateProjectService">
+    <state x="313" y="197" width="913" height="634" key="#Log_Highlighting_(ideolog)" timestamp="1609588123744">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="313" y="197" width="913" height="634" key="#Log_Highlighting_(ideolog)/0.0.1920.1080@0.0.1920.1080" timestamp="1609588123744" />
     <state x="450" y="34" width="1071" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1609576959039">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -174,46 +184,50 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="760" y="346" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1080@0.0.1920.1080" timestamp="1609510663065" />
-    <state width="1878" height="269" key="GridCell.Tab.0.bottom" timestamp="1609587892385">
+    <state x="553" y="112" key="CommitChangelistDialog2" timestamp="1609588031173">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1878" height="269" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1609587892385" />
-    <state width="1878" height="269" key="GridCell.Tab.0.center" timestamp="1609587892384">
+    <state x="553" y="112" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1609588031173" />
+    <state width="1878" height="376" key="GridCell.Tab.0.bottom" timestamp="1609599587422">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1878" height="269" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1609587892384" />
-    <state width="1878" height="269" key="GridCell.Tab.0.left" timestamp="1609587892383">
+    <state width="1878" height="376" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1609599587422" />
+    <state width="1878" height="376" key="GridCell.Tab.0.center" timestamp="1609599587421">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1878" height="269" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1609587892383" />
-    <state width="1878" height="269" key="GridCell.Tab.0.right" timestamp="1609587892384">
+    <state width="1878" height="376" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1609599587421" />
+    <state width="1878" height="376" key="GridCell.Tab.0.left" timestamp="1609599587421">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1878" height="269" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1609587892384" />
-    <state width="1878" height="376" key="GridCell.Tab.1.bottom" timestamp="1609583136699">
+    <state width="1878" height="376" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1609599587421" />
+    <state width="1878" height="376" key="GridCell.Tab.0.right" timestamp="1609599587422">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1878" height="376" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1609583136699" />
-    <state width="1878" height="376" key="GridCell.Tab.1.center" timestamp="1609583136698">
+    <state width="1878" height="376" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1609599587422" />
+    <state width="1878" height="376" key="GridCell.Tab.1.bottom" timestamp="1609599587423">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1878" height="376" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1609583136698" />
-    <state width="1878" height="376" key="GridCell.Tab.1.left" timestamp="1609583136698">
+    <state width="1878" height="376" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1609599587423" />
+    <state width="1878" height="376" key="GridCell.Tab.1.center" timestamp="1609599587423">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1878" height="376" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1609583136698" />
-    <state width="1878" height="376" key="GridCell.Tab.1.right" timestamp="1609583136699">
+    <state width="1878" height="376" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1609599587423" />
+    <state width="1878" height="376" key="GridCell.Tab.1.left" timestamp="1609599587422">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1878" height="376" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1609583136699" />
-    <state x="615" y="210" key="SettingsEditor" timestamp="1609512905405">
+    <state width="1878" height="376" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1609599587422" />
+    <state width="1878" height="376" key="GridCell.Tab.1.right" timestamp="1609599587423">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="615" y="210" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1609512905405" />
+    <state width="1878" height="376" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1609599587423" />
+    <state x="357" y="117" key="SettingsEditor" timestamp="1609599259068">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="357" y="117" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1609599259068" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/blh_blivedm$Blh.coverage" NAME="WebsocketBlh Coverage Results" MODIFIED="1609564594450" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/blh_blivedm$WebsocketBlh.coverage" NAME="WebsocketBlh Coverage Results" MODIFIED="1609587892378" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/wsBlhLib" />
+    <SUITE FILE_PATH="coverage/blh_blivedm$WebsocketBlh.coverage" NAME="WebsocketBlh Coverage Results" MODIFIED="1609588138822" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/wsBlhLib" />
     <SUITE FILE_PATH="coverage/blh_blivedm$mlogger.coverage" NAME="logger Coverage Results" MODIFIED="1609555381985" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

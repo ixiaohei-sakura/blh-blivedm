@@ -42,7 +42,7 @@ class BlhThread(Thread):
         _COMMAND_HANDLERS[cmd] = None
     del cmd
 
-    def __init__(self, roomId, logger: Logger, inMCDR=False, mcdr_server=None):
+    def __init__(self, roomId, logger: Logger, inMCDR=False, mcdr_server=None, head="BLH"):
         super(BlhThread, self).__init__()
         self.popularity = -1
         self.daemon = True
@@ -56,14 +56,15 @@ class BlhThread(Thread):
         self.old_popularity_str = ""
         self.running = False
         self.stopped = True
+        self.head = head
         if inMCDR:
-            self.MCDR_chat = MCDRChat(self.logger, mcdr_server)
+            self.MCDR_chat = MCDRChat(self.logger, mcdr_server, self.head)
 
     def start(self) -> None:
         self.run_flag = True
         self.room.updateData()
         self.logger.info("BlhThread 启动, 房间地址: {0}, 状态: {1}".format(self.room.roomUrl,
-                                                             "直播中" if self.room.live_status else "未开播"))
+                                                                   "直播中" if self.room.live_status else "未开播"))
         self.networkingThread.connect()
         super().start()
 
@@ -190,7 +191,7 @@ class BlhThread(Thread):
 
 
 class MCDRChat(object):
-    def __init__(self, logger, server):
+    def __init__(self, logger, server, head):
         self.logger = logger
         self.server = server
         self.old_popularity_str = -1
@@ -200,42 +201,41 @@ class MCDRChat(object):
         self.last_chat_message = None
         self.last_buy_guard = None
         self.last_gift = None
+        self.head = head
+
+    def serverSay(self, message):
+        self.server.say("§6[§2{}§6]§r".format(self.head) + message)
 
     def on_receive_chat(self, chat: ChatMessage):
-        # self.logger.info(f"\033[33m{'[房]' if chat.admin else ''}\033[0m"
-        #                  f"\033[35m[Lv{chat.user_level}]\033[0m"
-        #                  f"\033[36m[{chat.uname}]\033[0m: {chat.msg}")
-        pass
+        self.serverSay(f"§6{'[房]' if chat.admin else ''}§r"
+                       f"§5[Lv{chat.user_level}]§r"
+                       f"§7[{chat.uname}]§r: §f{chat.msg}§r")
 
     def on_super_chat(self, chat: SuperChatMessage):
-        # self.logger.info(f"\033[35m[Lv{chat.user_level}]\033[0m"
-        #                  f"\033[36m[{chat.uname}]\033[0m: {chat.message}")
-        pass
+        self.serverSay(f"§5[Lv{chat.user_level}]§r"
+                       f"§7[{chat.uname}]§r: §f{chat.message}§r")
 
     def on_receive_gift(self, data: GiftMessage):
-        # self.logger.info(f"\033[36m[{data.uname}]\033[0m: 送出 {data.gift_name}")
-        pass
+        self.serverSay(f"§7[{data.uname}]§r: §6送出 §e{data.gift_name}§r")
 
     def on_buy_guard(self, data: GuardBuyMessage):
-        # self.logger.info(f"\033[36m[{data.username}]\033[0m: \033[31m上了"
-        #                  f"{'舰长' if data.guard_level == 3 else '提督' if data.guard_level == 2 else '总督' if data.guard_level == 1 else ''}\033[0m")
-        pass
+        self.serverSay(f"§7[{data.username}]§r: §4上了"
+                        f"{'舰长' if data.guard_level == 3 else '提督' if data.guard_level == 2 else '总督' if data.guard_level == 1 else ''}§r")
 
     def on_super_chat_delete(self, chat: SuperChatDeleteMessage):
         pass
 
     def on_receive_popularity(self, popularity: int):
-        # self.popularity = popularity
-        # if self.old_popularity != popularity:
-        #     self.old_popularity = popularity
-        #     if self.popularity > 10000:
-        #         popularity_str = str(round(self.popularity / 10000, 1))
-        #         if self.old_popularity_str != popularity_str:
-        #             self.logger.info("人气值: " + popularity_str + "万")
-        #             self.old_popularity_str = popularity_str
-        #     else:
-        #         self.logger.info("人气值: " + str(popularity))
-        pass
+        self.popularity = popularity
+        if self.old_popularity != popularity:
+            self.old_popularity = popularity
+            if self.popularity > 10000:
+                popularity_str = str(round(self.popularity / 10000, 1))
+                if self.old_popularity_str != popularity_str:
+                    self.serverSay("人气值: " + popularity_str + "万")
+                    self.old_popularity_str = popularity_str
+            else:
+                self.serverSay("人气值: " + str(popularity))
 
 
 if __name__ == '__main__':
