@@ -53,6 +53,8 @@ class BlhControl(Thread):
         self.roomThreads = {}
         self.run_flag = False
         self.helpMsg = HelpMessages(config["CMD_PREFIX"])
+        for room, roomId in config["ROOM"].items():
+            self.roomThreads[room] = BlhThread(roomId, self.logger, True, self.server, head=config["LOGGER_HEAD"])
 
     def serverSay(self, message):
         self.server.say("§6[§2{}§6]§r".format(config["LOGGER_HEAD"]) + message)
