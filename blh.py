@@ -2,19 +2,8 @@ from queue import Queue
 from threading import Thread
 from typing import Any
 from logging import Logger
-try:
-    from plugins.wsBlhLib.mcdrPluginLib import HelpMessages
-    from plugins.wsBlhLib.WebsocketBlh import BlhThread
-except ImportError:
-    try:
-        from .wsBlhLib.mcdrPluginLib import HelpMessages
-        from .wsBlhLib.WebsocketBlh import BlhThread
-    except ImportError:
-        try:
-            from wsBlhLib.mcdrPluginLib import HelpMessages
-            from wsBlhLib.WebsocketBlh import BlhThread
-        except ImportError:
-            pass
+from utils.rtext import RText, RColor, RAction, RStyle, RTextList
+from plugins.wsBlhLib.WebsocketBlh import BlhThread
 import json
 plugin_dir = "./plugins/"
 config_dir = "./plugins/wsBlhLib/configs/"
@@ -39,6 +28,54 @@ def writeKey(path: str, key: str, data: Any):
     buff = readConfig(path)
     buff[key] = data
     writeConfig(path, buff)
+
+
+def get_text(text, mous='', cickrun='', color=RColor.white, run=True):
+    if mous != '':
+        if cickrun != '':
+            if run:
+                stxt = RText(text, color=color).set_hover_text(
+                    mous).set_click_event(RAction.run_command, cickrun)
+            else:
+                stxt = RText(text, color=color).set_hover_text(
+                    mous).set_click_event(RAction.suggest_command, cickrun)
+        else:
+            stxt = RText(text, color=color,
+                         styles=RStyle.italic).set_hover_text(mous)
+    else:
+        if cickrun == '':
+            stxt = RText(text, color=color)
+        else:
+            if run:
+                stxt = RText(text, color=color).set_click_event(
+                    RAction.run_command, cickrun)
+            else:
+                stxt = RText(text, color=color).set_click_event(
+                    RAction.suggest_command, cickrun)
+    return stxt
+
+
+class HelpMessages:
+    def __init__(self, Prefix):
+        self.easycmds = RTextList(
+            get_text('§e------------§bBlh帮助§e------------\n   '),
+            get_text(f'§7{Prefix} add [名称] [房间号]', '§b添加一个房间', f'{Prefix} add ', run=False),
+            get_text(' §r§b添加房间\n   '),
+            get_text(f'§7{Prefix} rm [名称]', '§b删除房间', f'{Prefix} rm ', run=False),
+            get_text(' §r§b删除房间\n   '),
+            get_text(f'§7{Prefix} start [名称]', '§b启动一个在配置文件里的房间', f'{Prefix} start ', run=False),
+            get_text(' §r§b订阅房间\n   '),
+            get_text(f'§7{Prefix} stop [名称]', '§b停止一个正在运行的房间', f'{Prefix} stop ', run=False),
+            get_text(' §r§b取消订阅\n   '),
+            get_text(f'§7{Prefix} list', '§b列出房间', f'{Prefix} list'),
+            get_text(' §r§b列出所有\n   '),
+            get_text(f'§7{Prefix} stopall', '§b停止所有房间', f'{Prefix} stopall'),
+            get_text(' §r§b停止所有\n   '),
+            get_text(f'§7{Prefix} startall', '§b启动所有开播的房间', f'{Prefix} startall'),
+            get_text(' §r§b启动所有\n   '),
+            get_text(f'§7{Prefix} listrun', '§b列出正在运行的房间', f'{Prefix} listrun'),
+            get_text(' §r§b列出房间\n'),
+        )
 
 
 class BlhControl(Thread):
@@ -78,8 +115,8 @@ class BlhControl(Thread):
                         self.server.say("   -{}".format(name))
             if cmd[0] == "list":
                 self.serverSay("配置文件中有以下房间:")
-                for name, room in config["ROOMS"].items():
-                    self.server.say(f"   -{name}: {room}")
+                for name, roomId in config["ROOMS"].items():
+                    self.serverSay(f"    -{name}: {roomId}")
         elif len(cmd) == 2:
             if cmd[0] == "rm":
                 self.remove(cmd[1])
