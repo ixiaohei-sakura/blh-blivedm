@@ -38,6 +38,8 @@ class HelpMessages:
             get_text(' §r§b订阅房间\n   '),
             get_text(f'§7{Prefix} stop [名称]', '§b停止一个正在运行的房间', f'{Prefix} stop ', run=False),
             get_text(' §r§b取消订阅\n   '),
+            get_text(f'§7{Prefix} list', '§b列出所有房间间', f'{Prefix} list'),
+            get_text(' §r§b列出所有\n   '),
             get_text(f'§7{Prefix} stopall', '§b停止所有房间', f'{Prefix} stopall'),
             get_text(' §r§b停止所有\n   '),
             get_text(f'§7{Prefix} startall', '§b启动所有开播的房间', f'{Prefix} startall'),
