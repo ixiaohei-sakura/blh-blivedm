@@ -76,6 +76,10 @@ class BlhControl(Thread):
                 for name, thread in self.roomThreads.items():
                     if thread.run_flag:
                         self.server.say("   -{}".format(name))
+            if cmd[0] == "list":
+                self.serverSay("配置文件中有以下房间:")
+                for name, room in config["ROOMS"].items():
+                    self.server.say(f"   -{name}: {room}")
         elif len(cmd) == 2:
             if cmd[0] == "rm":
                 self.remove(cmd[1])
