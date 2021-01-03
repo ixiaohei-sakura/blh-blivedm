@@ -24,7 +24,6 @@ config_dir = "./plugins/wsBlhLib/configs/"
 lib_dir = "./plugins/wsBlhLib/"
 config_file = config_dir + "config.json"
 config = {}
-player_count = 0
 
 
 def readConfig(path: str):
@@ -155,9 +154,6 @@ class BlhControl(Thread):
             self.server.reply(info, "§6[§2{}§6]§r".format(self.config["LOGGER_HEAD"]) + message)
 
     def parse_cmd(self, info):
-        if player_count == 0:
-            self.serverSay("服务器内没有玩家，强制停止所有房间！")
-            return
         cmd = info.content.split(' ')[1:len(info.content.split(' '))]
         if self.server.get_permission_level(info) < 2:
             self.serverSay("§4权限不足! 至少需要 管理员(2) 等级权限")
@@ -288,8 +284,6 @@ class BlhControl(Thread):
         while self.run_flag:
             if len(self.infoQueue.queue) > 0:
                 self.parse_cmd(self.infoQueue.get())
-            if player_count == 0:
-                self.stopAll()
 
 
 blhMain = None
@@ -333,13 +327,3 @@ def on_info(server, info):
     if info.content.startswith(config["CMD_PREFIX"]):
         if blhMain is not None:
             blhMain.addInfo(info)
-
-
-def on_player_joined(server, player, info):
-    global player_count
-    player_count += 1
-
-
-def on_player_left(server, player):
-    global player_count
-    player_count -= 1
