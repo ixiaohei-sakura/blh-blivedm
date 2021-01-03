@@ -113,7 +113,7 @@
       <workItem from="1609599694108" duration="2327000" />
       <workItem from="1609603855718" duration="16000" />
       <workItem from="1609604042046" duration="12000" />
-      <workItem from="1609604260613" duration="11017000" />
+      <workItem from="1609604260613" duration="11112000" />
     </task>
     <task id="LOCAL-00001" summary="ws库完工">
       <created>1609588031414</created>
@@ -178,7 +178,14 @@
       <option name="project" value="LOCAL" />
       <updated>1609676876635</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="fix bug #2">
+      <created>1609677039578</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1609677039578</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -191,7 +198,8 @@
     <MESSAGE value="又一个小细节" />
     <MESSAGE value="最终版, 未来更新" />
     <MESSAGE value="bug 1#" />
-    <option name="LAST_COMMIT_MESSAGE" value="bug 1#" />
+    <MESSAGE value="fix bug #2" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix bug #2" />
   </component>
   <component name="WindowStateProjectService">
     <state x="313" y="197" width="913" height="634" key="#Log_Highlighting_(ideolog)" timestamp="1609588123744">
@@ -206,10 +214,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="760" y="346" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1080@0.0.1920.1080" timestamp="1609510663065" />
-    <state x="553" y="112" key="CommitChangelistDialog2" timestamp="1609676876484">
+    <state x="553" y="112" key="CommitChangelistDialog2" timestamp="1609677039440">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="553" y="112" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1609676876484" />
+    <state x="553" y="112" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1609677039440" />
     <state width="1878" height="269" key="GridCell.Tab.0.bottom" timestamp="1609676808430">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>

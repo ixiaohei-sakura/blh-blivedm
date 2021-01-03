@@ -89,13 +89,13 @@ class HelpMessages:
             get_text(' §r§b启动所有\n   '),
             get_text(f'§7{Prefix} listrun', '§b列出正在运行的房间', f'{Prefix} listrun'),
             get_text(' §r§b列出房间\n'),
-            get_text('§e------------§bBlh帮助 1/2§e------------\n   '),
+            get_text('§e------------§bBlh帮助 1/2§e------------   '),
         )
         self.easycmds_2 = RTextList(
             get_text('§e------------§bBlh帮助 2/2§e------------\n   '),
             get_text(f'§7   {Prefix} reload', '§b重载插件', f'{Prefix} reload'),
             get_text(' §r§b重载插件'),
-            get_text('§e------------§bBlh帮助 2/2§e------------\n   '),
+            get_text('§e------------§bBlh帮助 2/2§e------------   '),
         )
 
 
@@ -160,7 +160,7 @@ class BlhControl(Thread):
             return
         if len(cmd) == 0:
             if info.is_player:
-                self.serverSay(info.player, self.helpMsg.easycmds_1.to_json_object())
+                self.server.tell(info.player, self.helpMsg.easycmds_1.to_json_object())
             else:
                 self.serverSay(f"输入 {self.config['CMD_PREFIX']} 来获取帮助", info=info, reply=True)
         elif len(cmd) == 1:
