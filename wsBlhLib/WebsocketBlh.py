@@ -91,7 +91,10 @@ class BlhThread(Thread):
 
     def getState(self):
         self.room.updateData()
-        return "直播中" if self.room.live_status else "未开播"
+        return "§2直播中" if self.room.live_status else "§e未开播"
+
+    def setGiftMessage(self, enable=True):
+        self.MCDR_chat.setGiftAllow(enable)
 
     def _handle_message(self, data):
         offset = 0
@@ -206,6 +209,10 @@ class MCDRChat(object):
         self.last_gift = None
         self.head = head
         self.room = room
+        self.enable_gift_message = True
+
+    def setGiftAllow(self, enable=True):
+        self.enable_gift_message = enable
 
     def serverSay(self, message):
         self.server.say("§6[§2{}§6]§6[§3{}§6]§r".format(self.head, str(self.room)) + message)
@@ -220,7 +227,8 @@ class MCDRChat(object):
                        f"§7[{chat.uname}]§r: §f{chat.message}§r")
 
     def on_receive_gift(self, data: GiftMessage):
-        self.serverSay(f"§7[{data.uname}]§r: §6送出 §e{data.gift_name}§r")
+        if self.enable_gift_message:
+            self.serverSay(f"§7[{data.uname}]§r: §6送出 §e{data.gift_name}§r")
 
     def on_buy_guard(self, data: GuardBuyMessage):
         self.serverSay(f"§7[{data.username}]§r: §4上了"
