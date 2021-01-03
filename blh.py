@@ -72,29 +72,34 @@ def get_text(text, mous='', cickrun='', color=RColor.white, run=True):
 class HelpMessages:
     def __init__(self, Prefix):
         self.easycmds_1 = RTextList(
-            get_text('§e------------§bBlh帮助 1/2§e------------\n   '),
+            get_text('§e------------§bBlh帮助 1/2§e------------\n'),
             get_text(f'§7{Prefix} add [名称] [房间号]', '§b添加一个房间', f'{Prefix} add ', run=False),
-            get_text(' §r§b添加房间\n   '),
+            get_text(' §r§b添加房间\n'),
             get_text(f'§7{Prefix} rm [名称]', '§b删除房间', f'{Prefix} rm ', run=False),
-            get_text(' §r§b删除房间\n   '),
+            get_text(' §r§b删除房间\n'),
             get_text(f'§7{Prefix} start [名称]', '§b启动一个在配置文件里的房间', f'{Prefix} start ', run=False),
-            get_text(' §r§b订阅房间\n   '),
+            get_text(' §r§b订阅房间\n'),
             get_text(f'§7{Prefix} stop [名称]', '§b停止一个正在运行的房间', f'{Prefix} stop ', run=False),
-            get_text(' §r§b取消订阅\n   '),
+            get_text(' §r§b取消订阅\n'),
             get_text(f'§7{Prefix} list', '§b列出房间', f'{Prefix} list'),
-            get_text(' §r§b列出所有\n   '),
+            get_text(' §r§b列出所有\n'),
             get_text(f'§7{Prefix} stopall', '§b停止所有房间', f'{Prefix} stopall'),
-            get_text(' §r§b停止所有\n   '),
+            get_text(' §r§b停止所有\n'),
             get_text(f'§7{Prefix} startall', '§b启动所有开播的房间', f'{Prefix} startall'),
-            get_text(' §r§b启动所有\n   '),
-            get_text(f'§7{Prefix} listrun', '§b列出正在运行的房间', f'{Prefix} listrun'),
-            get_text(' §r§b列出房间\n'),
-            get_text('§e------------§bBlh帮助 1/2§e------------   '),
+            get_text(' §r§b启动所有\n'),
+            get_text('§6             上一页        '), get_text('§6下一页\n', cickrun=f'{Prefix} help 2'),
+            get_text('§e------------§bBlh帮助 1/2§e------------'),
         )
         self.easycmds_2 = RTextList(
-            get_text('§e------------§bBlh帮助 2/2§e------------\n   '),
-            get_text(f'§7   {Prefix} reload', '§b重载插件', f'{Prefix} reload'),
-            get_text(' §r§b重载插件'),
+            get_text('§e------------§bBlh帮助 2/2§e------------\n'),
+            get_text(f'§7{Prefix} listrun', '§b列出正在运行的房间', f'{Prefix} listrun'),
+            get_text(' §r§b列出房间\n'),
+            get_text(f'§7{Prefix} reload', '§b重载插件', f'{Prefix} reload'),
+            get_text(' §r§b重载插件\n'),
+            get_text(f'§7{Prefix} gift [房间名] [True/False]', '§b设置礼物消息', f'{Prefix} gift ', run=False),
+            get_text(' §r§b设置礼物消息\n'),
+            get_text("\n\n\n\n"),
+            get_text('§6             上一页        ', cickrun=f'{Prefix} help 1'), get_text('§6下一页\n'),
             get_text('§e------------§bBlh帮助 2/2§e------------   '),
         )
 
@@ -111,8 +116,8 @@ class BlhControl(Thread):
         self.rooms = {}
         self.roomThreads = {}
         self.infoQueue = Queue(100)
-        self.reloadThreads()
         self.reloadConfig()
+        self.reloadThreads()
         self.helpMsg = HelpMessages(self.config["CMD_PREFIX"])
         self.logger.info("Blh 初始化完毕")
 
@@ -123,6 +128,12 @@ class BlhControl(Thread):
         else:
             return False
 
+    def checkThreadExist(self, roomName):
+        for room in self.roomThreads.keys():
+            if room == roomName:
+                return True
+        return False
+
     def reloadSelfPlugin(self):
         self.stopAll()
         self.stop()
@@ -130,15 +141,13 @@ class BlhControl(Thread):
 
     def reloadThreads(self):
         self.reloadConfig()
-        for room, roomId in self.config["ROOMS"].items():
-            try:
-                state = self.roomThreads[room].stopped
-                if state:
-                    self.roomThreads[room] = BlhThread(roomId, self.logger, True, self.server,
-                                                       head=self.config["LOGGER_HEAD"])
-            except KeyError:
+        for room, roomId in self.rooms.items():
+            if not self.checkThreadExist(room):
                 self.roomThreads[room] = BlhThread(roomId, self.logger, True, self.server,
                                                    head=self.config["LOGGER_HEAD"])
+            if self.roomThreads[room].stopped:
+                self.roomThreads[room] = BlhThread(roomId, self.logger, True, self.server,
+                                                       head=self.config["LOGGER_HEAD"])
 
     def reloadConfig(self):
         self.config = readConfig(config_file)
