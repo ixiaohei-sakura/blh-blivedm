@@ -3,6 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="28c4d2cf-753f-4e33-9a70-baa7e0a5a6d1" name="默认更改列表" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blh.py" beforeDir="false" afterPath="$PROJECT_DIR$/blh.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wsBlhLib/WebsocketBlh.py" beforeDir="false" afterPath="$PROJECT_DIR$/wsBlhLib/WebsocketBlh.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wsBlhLib/mcdrPluginLib/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/wsBlhLib/mcdrPluginLib/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,7 +116,7 @@
       <workItem from="1609599694108" duration="2327000" />
       <workItem from="1609603855718" duration="16000" />
       <workItem from="1609604042046" duration="12000" />
-      <workItem from="1609604260613" duration="725000" />
+      <workItem from="1609604260613" duration="8392000" />
     </task>
     <task id="LOCAL-00001" summary="ws库完工">
       <created>1609588031414</created>
@@ -157,7 +160,14 @@
       <option name="project" value="LOCAL" />
       <updated>1609604381571</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="又一个小细节">
+      <created>1609605254165</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1609605254165</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -183,10 +193,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="760" y="346" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1080@0.0.1920.1080" timestamp="1609510663065" />
-    <state x="553" y="112" key="CommitChangelistDialog2" timestamp="1609604381375">
+    <state x="553" y="112" key="CommitChangelistDialog2" timestamp="1609605253939">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="553" y="112" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1609604381375" />
+    <state x="553" y="112" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1609605253939" />
     <state width="1878" height="376" key="GridCell.Tab.0.bottom" timestamp="1609599587422">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>

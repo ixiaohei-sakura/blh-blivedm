@@ -1,10 +1,17 @@
 import time
 import zlib
-from wsBlhLib.network import NetworkingThread
-from wsBlhLib.logger import Logger
-from wsBlhLib.thread_rewrite import stop_thread
-from wsBlhLib.messages import *
-from wsBlhLib.packs import *
+try:
+    from wsBlhLib.network import NetworkingThread
+    from wsBlhLib.logger import Logger
+    from wsBlhLib.thread_rewrite import stop_thread
+    from wsBlhLib.messages import *
+    from wsBlhLib.packs import *
+except ImportError:
+    from .network import NetworkingThread
+    from .logger import Logger
+    from .thread_rewrite import stop_thread
+    from .messages import *
+    from .packs import *
 from threading import Thread
 
 
@@ -54,11 +61,10 @@ class BlhThread(Thread):
         self.inMCDR = inMCDR
         self.old_popularity = -1
         self.old_popularity_str = ""
-        self.running = False
-        self.stopped = True
+        self.stopped = False
         self.head = head
         if inMCDR:
-            self.MCDR_chat = MCDRChat(self.logger, mcdr_server, self.head)
+            self.MCDR_chat = MCDRChat(self.logger, mcdr_server, self.head, self.room.roomId)
 
     def start(self) -> None:
         self.run_flag = True
@@ -76,14 +82,11 @@ class BlhThread(Thread):
             self.networkingThread.close()
 
     def run(self):
-        self.stopped = False
-        self.running = True
         self.logger.debug("事件循环开始")
         self.networkingThread.send_pack(AuthPack(self.room))
         while self.run_flag:
             time.sleep(0.1)
         self.logger.info("事件循环结束")
-        self.running = False
         self.stopped = True
 
     def getState(self):
@@ -191,7 +194,7 @@ class BlhThread(Thread):
 
 
 class MCDRChat(object):
-    def __init__(self, logger, server, head):
+    def __init__(self, logger, server, head, room):
         self.logger = logger
         self.server = server
         self.old_popularity_str = -1
@@ -202,9 +205,10 @@ class MCDRChat(object):
         self.last_buy_guard = None
         self.last_gift = None
         self.head = head
+        self.room = room
 
     def serverSay(self, message):
-        self.server.say("§6[§2{}§6]§r".format(self.head) + message)
+        self.server.say("§6[§2{}§6]§6[§3{}§6]§r".format(self.head, str(self.room)) + message)
 
     def on_receive_chat(self, chat: ChatMessage):
         self.serverSay(f"§6{'[房]' if chat.admin else ''}§r"

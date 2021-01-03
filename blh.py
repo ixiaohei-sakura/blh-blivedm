@@ -2,9 +2,16 @@ from queue import Queue
 from threading import Thread
 from typing import Any
 from logging import Logger
-from utils.rtext import RText, RColor, RAction, RStyle, RTextList
-from plugins.wsBlhLib.WebsocketBlh import BlhThread
 import json
+import os
+
+try:
+    from utils.rtext import RText, RColor, RAction, RStyle, RTextList
+    from plugins.wsBlhLib.WebsocketBlh import BlhThread
+    from plugins.wsBlhLib.mcdrPluginLib import *
+except ImportError:
+    pass
+
 plugin_dir = "./plugins/"
 config_dir = "./plugins/wsBlhLib/configs/"
 lib_dir = "./plugins/wsBlhLib/"
@@ -75,26 +82,57 @@ class HelpMessages:
             get_text(' §r§b启动所有\n   '),
             get_text(f'§7{Prefix} listrun', '§b列出正在运行的房间', f'{Prefix} listrun'),
             get_text(' §r§b列出房间\n'),
+            get_text(f'§7   {Prefix} reload', '§b重载插件', f'{Prefix} reload'),
+            get_text(' §r§b重载插件'),
         )
 
 
 class BlhControl(Thread):
     def __init__(self, server, logger: Logger):
         super(BlhControl, self).__init__()
-        self.name = "BlhMainThread"
-        self.daemon = True
-        self.infoQueue = Queue(100)
         self.server = server
         self.logger = logger
+        self.name = "BlhMainThread"
+        self.daemon = True
+        self.run_flag = False
+        self.config = {}
         self.rooms = {}
         self.roomThreads = {}
-        self.run_flag = False
-        self.helpMsg = HelpMessages(config["CMD_PREFIX"])
-        for room, roomId in config["ROOMS"].items():
-            self.roomThreads[room] = BlhThread(roomId, self.logger, True, self.server, head=config["LOGGER_HEAD"])
+        self.infoQueue = Queue(100)
+        self.reloadThreads()
+        self.reloadConfig()
+        self.helpMsg = HelpMessages(self.config["CMD_PREFIX"])
+        self.logger.info("Blh 初始化完毕")
 
-    def serverSay(self, message):
-        self.server.say("§6[§2{}§6]§r".format(config["LOGGER_HEAD"]) + message)
+    def reloadSelfPlugin(self):
+        self.stopAll()
+        self.stop()
+        self.server.load_plugin(os.path.basename(__file__))
+
+    def reloadThreads(self):
+        self.reloadConfig()
+        for room, roomId in self.config["ROOMS"].items():
+            try:
+                state = self.roomThreads[room].stopped
+                if state:
+                    self.roomThreads[room] = BlhThread(roomId, self.logger, True, self.server,
+                                                       head=self.config["LOGGER_HEAD"])
+            except KeyError:
+                self.roomThreads[room] = BlhThread(roomId, self.logger, True, self.server,
+                                                   head=self.config["LOGGER_HEAD"])
+
+    def reloadConfig(self):
+        self.config = readConfig(config_file)
+        for name, roomId in self.config["ROOMS"].items():
+            self.rooms[name] = roomId
+
+    def serverSay(self, message, info=None, tell=False, reply=False):
+        if info is None:
+            self.server.say("§6[§2{}§6]§r".format(self.config["LOGGER_HEAD"]) + message)
+        elif tell:
+            self.server.tell(info.player, "§6[§2{}§6]§r".format(self.config["LOGGER_HEAD"]) + message)
+        elif reply:
+            self.server.reply(info, "§6[§2{}§6]§r".format(self.config["LOGGER_HEAD"]) + message)
 
     def parse_cmd(self, info):
         cmd = info.content.split(' ')[1:len(info.content.split(' '))]
@@ -103,34 +141,45 @@ class BlhControl(Thread):
                 self.server.tell(info.player, self.helpMsg.easycmds.to_json_object())
         elif len(cmd) == 1:
             if cmd[0] == "stopall":
+                self.serverSay("停止了所有正在运行的房间", info=info, reply=True)
                 self.stopAll()
-                self.serverSay("停止了所有正在运行的房间")
             if cmd[0] == "startall":
+                self.serverSay("启动了所有已开播的房间", info=info, reply=True)
                 self.startAll()
-                self.serverSay("启动了所有已开播的房间")
             if cmd[0] == "listrun":
-                self.serverSay("有以下房间正在运行: ")
+                self.serverSay("有以下房间正在运行: ", info=info, reply=True)
                 for name, thread in self.roomThreads.items():
                     if thread.run_flag:
-                        self.server.say("   -{}".format(name))
+                        self.server.say("   -{}".format(name), info=info, reply=True)
+            if cmd[0] == "reload":
+                self.serverSay("正在重载...")
+                self.reloadSelfPlugin()
             if cmd[0] == "list":
-                self.serverSay("配置文件中有以下房间:")
-                for name, roomId in config["ROOMS"].items():
-                    self.serverSay(f"    -{name}: {roomId}")
+                self.serverSay("配置文件中有以下房间:", info=info, reply=True)
+                for name, roomId in self.config["ROOMS"].items():
+                    self.serverSay(f"    -{name}: {roomId}, "
+                                   f"状态: {self.roomThreads[name].getState()}",
+                                   info=info, reply=True)
         elif len(cmd) == 2:
             if cmd[0] == "rm":
-                self.remove(cmd[1])
-                self.serverSay("房间 {} 删除完毕".format(cmd[1]))
+                self.serverSay(self.remove(cmd[1]), info=info, reply=True)
             if cmd[0] == "start":
-                self.serverSay("房间 {} 正在启动".format(cmd[1]))
+                if cmd[1] == "all":
+                    self.serverSay("启动了所有已开播的房间", info=info, reply=True)
+                    self.startAll()
+                    return
+                self.serverSay("房间 {} 正在启动".format(cmd[1]), info=info, reply=True)
                 self.startSingleRoomThread(cmd[1])
             if cmd[0] == "stop":
-                self.serverSay("房间 {} 正在停止".format(cmd[1]))
+                if cmd[1] == "all":
+                    self.serverSay("停止了所有正在运行的房间", info=info, reply=True)
+                    self.stopAll()
+                    return
+                self.serverSay("房间 {} 正在停止".format(cmd[1]), info=info, reply=True)
                 self.stopSingleThread(cmd[1])
         elif len(cmd) == 3:
             if cmd[0] == "add":
-                self.add(cmd[1], cmd[2])
-                self.serverSay("房间 {0}-{1} 添加完毕".format(cmd[1], cmd[2]))
+                self.serverSay(self.add(cmd[1], cmd[2]), info=info, reply=True)
 
     def addInfo(self, cmd):
         self.infoQueue.put(cmd)
@@ -138,14 +187,14 @@ class BlhControl(Thread):
     def add(self, name: str, roomId: int):
         for key in self.rooms.keys():
             if key == name:
-                return "房间已存在"
+                return "[§4失败, 原因§r]: §e房间已存在"
         roomId = int(roomId)
         d = readConfig(config_file)
         self.rooms[name] = roomId
-        self.roomThreads[name] = BlhThread(roomId, self.logger, True, self.server, head=config["LOGGER_HEAD"])
         d["ROOMS"] = self.rooms
         writeConfig(config_file, d)
-        return "完成"
+        self.reloadThreads()
+        return "§2房间 {}: {} 添加成功".format(name, roomId)
 
     def remove(self, name: str):
         try:
@@ -153,19 +202,22 @@ class BlhControl(Thread):
             self.roomThreads[name].stop()
             del self.roomThreads[name]
         except AttributeError:
-            return "房间不存在"
+            return "[§4失败, 原因§r]: §e房间不存在"
         writeKey(config_file, "ROOMS", self.rooms)
-        return "完成"
+        return "§2房间 {} 删除成功".format(name)
 
     def startSingleRoomThread(self, name):
+        self.reloadThreads()
         if not self.roomThreads[name].run_flag:
             self.roomThreads[name].start()
 
     def stopSingleThread(self, name):
+        self.reloadThreads()
         if self.roomThreads[name].run_flag:
             self.roomThreads[name].stop()
 
     def startAll(self):
+        self.reloadThreads()
         for thread in self.roomThreads.values():
             if thread.room.live_status:
                 thread.start()
@@ -174,12 +226,14 @@ class BlhControl(Thread):
         for thread in self.roomThreads.values():
             if thread.run_flag:
                 thread.stop()
+        self.reloadThreads()
 
     def start(self) -> None:
         self.run_flag = True
         super(BlhControl, self).start()
 
     def stop(self):
+        self.stopAll()
         self.run_flag = False
 
     def run(self) -> None:
@@ -188,32 +242,44 @@ class BlhControl(Thread):
                 self.parse_cmd(self.infoQueue.get())
 
 
+blhMain = None
 blhMain: BlhControl
 
 
-def on_load(server, old):
-    if hasattr(old, "blhMain"):
-        old.blhMain.stopAll()
-        old.blhMain.stop()
-    global config, blhMain
-    config = readConfig(config_file)
+def reloadBlhMainThread(server):
+    global blhMain
+    if blhMain is not None:
+        blhMain.stop()
     blhMain = BlhControl(server, server.logger)
     blhMain.start()
 
 
+def on_load(server, old):
+    global config
+    config = readConfig(config_file)
+    if hasattr(old, "blhMain"):
+        if old.blhMain is not None:
+            old.blhMain.stop()
+    reloadBlhMainThread(server)
+
+
 def on_unload(server):
     global blhMain
-    blhMain.stop()
-    blhMain.join()
+    if blhMain is not None:
+        blhMain.stop()
+        blhMain.join()
 
 
 def on_mcdr_stop(server):
     global blhMain
-    blhMain.stop()
-    blhMain.join()
+    if blhMain is not None:
+        blhMain.stop()
+        blhMain.join()
 
 
 def on_info(server, info):
-    global blhMain
+    global blhMain, config
+    config = readConfig(config_file)
     if info.content.startswith(config["CMD_PREFIX"]):
-        blhMain.addInfo(info)
+        if blhMain is not None:
+            blhMain.addInfo(info)
