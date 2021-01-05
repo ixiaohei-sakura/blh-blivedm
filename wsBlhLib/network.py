@@ -1,5 +1,4 @@
 from websocket import WebSocket, ABNF
-from websocket._exceptions import WebSocketConnectionClosedException
 from threading import Thread
 from queue import Queue
 from time import sleep
@@ -59,9 +58,6 @@ class NetworkingThread(Thread):
         self.dataQueue = Queue(100)
         self.run_flag = True
 
-    def stop(self):
-        self.run_flag = False
-
     def connect(self, just_check=False):
         if just_check:
             if not self.connection.connected:
@@ -108,14 +104,18 @@ class NetworkingThread(Thread):
         return None
 
     def call_back_func(self):
-        while True:
+        while self.run_flag:
             try:
                 buff = self.connection.recv()
                 self.cb(buff)
                 break
-            except WebSocketConnectionClosedException:
+            except Exception as exc:
+                del exc
                 self.connect(True)
                 continue
+
+    def stop(self):
+        self.run_flag = False
 
     def run(self) -> None:
         self.logger.info("网络线程启动")

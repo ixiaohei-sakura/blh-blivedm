@@ -5,6 +5,10 @@ from logging import Logger
 import json
 import os
 
+"""
+Websocket BLH By ixiaohei 2021 01 05
+"""
+
 try:
     from utils.rtext import RText, RColor, RAction, RStyle, RTextList
     from plugins.wsBlhLib.WebsocketBlh import BlhThread
@@ -168,10 +172,7 @@ class BlhControl(Thread):
             self.serverSay("§4权限不足! 至少需要 管理员(2) 等级权限")
             return
         if len(cmd) == 0:
-            if info.is_player:
-                self.server.tell(info.player, self.helpMsg.easycmds_1.to_json_object())
-            else:
-                self.serverSay(f"输入 {self.config['CMD_PREFIX']} 来获取帮助", info=info, reply=True)
+            self.server.reply(info, self.helpMsg.easycmds_1.to_json_object())
         elif len(cmd) == 1:
             if cmd[0] == "stopall":
                 self.serverSay("§2停止了所有正在运行的房间§r", info=info, reply=True)
@@ -193,8 +194,10 @@ class BlhControl(Thread):
                     self.serverSay(f"    -§6{name}: §a{roomId}, "
                                    f"§b状态§r: {self.roomThreads[name].getState()}",
                                    info=info, reply=True)
+            elif cmd[0] == "help":
+                self.server.reply(info, self.helpMsg.easycmds_1.to_json_object())
             else:
-                self.serverSay(f"输入 {self.config['CMD_PREFIX']} 来获取帮助", info=info, reply=True)
+                self.serverSay(f"输入 {self.config['CMD_PREFIX']} help 来获取帮助", info=info, reply=True)
         elif len(cmd) == 2:
             if cmd[0] == "rm":
                 self.serverSay(self.remove(cmd[1]), info=info, reply=True)
@@ -213,24 +216,24 @@ class BlhControl(Thread):
                 self.serverSay("§2房间 {} 正在停止".format(cmd[1]), info=info, reply=True)
                 self.stopSingleThread(cmd[1])
             elif cmd[0] == "help":
-                if info.is_player and cmd[1] == "1":
-                    self.server.tell(info.player, self.helpMsg.easycmds_1.to_json_object())
-                elif info.is_player and cmd[1] == "2":
-                    self.server.tell(info.player, self.helpMsg.easycmds_2.to_json_object())
+                if cmd[1] == "1":
+                    self.server.reply(info, self.helpMsg.easycmds_1.to_json_object())
+                elif cmd[1] == "2":
+                    self.server.reply(info, self.helpMsg.easycmds_2.to_json_object())
             else:
-                self.serverSay(f"输入 {self.config['CMD_PREFIX']} 来获取帮助", info=info, reply=True)
+                self.serverSay(f"输入 {self.config['CMD_PREFIX']} help 来获取帮助", info=info, reply=True)
         elif len(cmd) == 3:
             if cmd[0] == "add":
                 self.serverSay(self.add(cmd[1], cmd[2]), info=info, reply=True)
             elif cmd[0] == "gift":
                 if not self.checkRoomExist(cmd[1]):
-                    self.serverSay("[§4失败, 原因§r]: §e房间不存在")
+                    self.serverSay("[§4失败, 原因§r]: §e房间不存在", info=info, reply=True)
                     return
                 else:
                     self.roomThreads[cmd[1]].setGiftMessage(bool(cmd[2]))
-                    self.serverSay("成功设置此房间的礼物消息")
+                    self.serverSay("成功设置此房间的礼物消息", info=info, reply=True)
         else:
-            self.serverSay(f"输入 {self.config['CMD_PREFIX']} 来获取帮助", info=info, reply=True)
+            self.serverSay(f"输入 {self.config['CMD_PREFIX']} help 来获取帮助", info=info, reply=True)
 
     def addInfo(self, cmd):
         self.infoQueue.put(cmd)
