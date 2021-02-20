@@ -19,7 +19,7 @@ class Logger(logging.Logger):
         self.__logger__format__ = f"[{self.name}][{self.sub_name}][%(asctime)s][%(threadName)s/%(levelname)s]: %(message)s"
 
         file_handler = TimedRotatingFileHandler(filename=self.__log_path__, when=self.__when__,
-                                                interval=1, backupCount=30)
+                                                interval=1, backupCount=30, encoding="utf-8")
         file_handler.suffix = "%Y-%m-%d.log"
         file_handler.extMatch = re.compile(r"^\d{4}-\d{2}-\d{2}.log$")
         file_handler.setFormatter(logging.Formatter(self.__logger__format__))
